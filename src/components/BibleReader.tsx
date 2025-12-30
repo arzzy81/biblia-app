@@ -49,9 +49,10 @@ export function BibleReader({
     if (isOpen) {
       loadChapter();
     }
-  }, [isOpen, currentChapter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, currentChapter, book]);
 
-  const getCacheKey = () => `bible_cache_${book}_${currentChapter}`;
+  const getCacheKey = () => `bible_cache_${book}_${currentChapter}_NVI`;
 
   async function loadChapter(forceReload = false) {
     setLoading(true);
@@ -70,7 +71,15 @@ export function BibleReader({
         }
       }
 
-      const text = await fetchBibleChapter(book, currentChapter, 'ARC');
+      // ✅ NVI
+      // Fallback: se fetchBibleChapter aceitar só 2 argumentos, funciona também.
+      let text: string;
+      try {
+        text = await (fetchBibleChapter as any)(book, currentChapter, 'NVI');
+      } catch {
+        text = await (fetchBibleChapter as any)(book, currentChapter);
+      }
+
       setChapterText(text);
 
       localStorage.setItem(
@@ -82,9 +91,7 @@ export function BibleReader({
       );
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Erro ao carregar o capítulo'
+        err instanceof Error ? err.message : 'Erro ao carregar o capítulo'
       );
     } finally {
       setLoading(false);
@@ -118,7 +125,7 @@ export function BibleReader({
                 {book} {currentChapter}
               </h2>
               <p className="text-xs text-[#DADADA]">
-                ARC – Almeida Revista e Corrigida
+                NVI – Nova Versão Internacional
               </p>
             </div>
           </div>
@@ -128,6 +135,7 @@ export function BibleReader({
               <button
                 onClick={() => setFontSize(Math.max(12, fontSize - 2))}
                 className="p-1.5 hover:bg-white/10 rounded"
+                title="Diminuir fonte"
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -135,6 +143,7 @@ export function BibleReader({
               <button
                 onClick={() => setFontSize(Math.min(24, fontSize + 2))}
                 className="p-1.5 hover:bg-white/10 rounded"
+                title="Aumentar fonte"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -144,6 +153,7 @@ export function BibleReader({
               onClick={() => loadChapter(true)}
               className="p-2 hover:bg-white/10 rounded"
               disabled={loading}
+              title="Recarregar"
             >
               <RefreshCw
                 className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
@@ -154,6 +164,7 @@ export function BibleReader({
               onClick={handleCopyText}
               disabled={!chapterText}
               className="p-2 hover:bg-white/10 rounded"
+              title="Copiar"
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -165,6 +176,7 @@ export function BibleReader({
                   ? 'bg-green-500/20 text-green-400'
                   : 'bg-white/5 hover:bg-white/10'
               }`}
+              title={isRead ? 'Marcar como não lido' : 'Marcar como lido'}
             >
               <CheckCircle2 className="w-4 h-4" />
               {isRead ? 'Lido' : 'Marcar'}
@@ -173,6 +185,7 @@ export function BibleReader({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/10 rounded"
+              title="Fechar"
             >
               <X className="w-5 h-5" />
             </button>
@@ -208,11 +221,11 @@ export function BibleReader({
         <div className="flex items-center justify-between p-4 border-t border-white/10 bg-black/20">
           <button
             onClick={() =>
-              currentChapter > 1 &&
-              setCurrentChapter(currentChapter - 1)
+              currentChapter > 1 && setCurrentChapter(currentChapter - 1)
             }
             disabled={currentChapter === 1}
             className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded disabled:opacity-30"
+            title="Anterior"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -228,6 +241,7 @@ export function BibleReader({
             }
             disabled={currentChapter === totalChapters}
             className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded disabled:opacity-30"
+            title="Próximo"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

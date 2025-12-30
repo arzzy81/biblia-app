@@ -11,7 +11,6 @@ import {
   Plus,
   Minus,
 } from 'lucide-react';
-import { fetchBibleChapter } from '../utils/bibleApi';
 import { toast } from 'sonner@2.0.3';
 
 interface BibleReaderProps {
@@ -23,6 +22,12 @@ interface BibleReaderProps {
   isRead: boolean;
   onMarkAsRead: () => void;
 }
+
+type BibleJSON = {
+  [book: string]: {
+    chapters: string[][];
+  };
+};
 
 export function BibleReader({
   isOpen,
@@ -40,58 +45,39 @@ export function BibleReader({
   const [fontSize, setFontSize] = useState(16);
 
   useEffect(() => {
-    if (isOpen) {
-      setCurrentChapter(chapter);
-    }
+    if (isOpen) setCurrentChapter(chapter);
   }, [isOpen, chapter]);
 
   useEffect(() => {
-    if (isOpen) {
-      loadChapter();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, currentChapter, book]);
+    if (isOpen) loadChapter();
+  }, [isOpen, currentChapter]);
 
-  const getCacheKey = () => `bible_cache_${book}_${currentChapter}_NVI`;
-
-  async function loadChapter(forceReload = false) {
+  async function loadChapter() {
     setLoading(true);
     setError(null);
 
     try {
-      if (!forceReload) {
-        const cached = localStorage.getItem(getCacheKey());
-        if (cached) {
-          const { text, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < 7 * 24 * 60 * 60 * 1000) {
-            setChapterText(text);
-            setLoading(false);
-            return;
-          }
-        }
-      }
+      const res = await fetch('/nvi.json');
+      if (!res.ok) throw new Error('Arquivo da Bíblia não encontrado');
 
-      // ✅ NVI
-      // Fallback: se fetchBibleChapter aceitar só 2 argumentos, funciona também.
-      let text: string;
-      try {
-        text = await (fetchBibleChapter as any)(book, currentChapter, 'NVI');
-      } catch {
-        text = await (fetchBibleChapter as any)(book, currentChapter);
-      }
+      const bible: BibleJSON = await res.json();
+
+      const bookData = bible[book];
+      if (!bookData) throw new Error(`Livro não encontrado: ${book}`);
+
+      const verses = bookData.chapters[currentChapter - 1];
+      if (!verses) throw new Error('Capítulo não encontrado');
+
+      const text = verses
+        .map((v, i) => `${i + 1}. ${v}`)
+        .join('\n');
 
       setChapterText(text);
-
-      localStorage.setItem(
-        getCacheKey(),
-        JSON.stringify({
-          text,
-          timestamp: Date.now(),
-        })
-      );
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Erro ao carregar o capítulo'
+        err instanceof Error
+          ? err.message
+          : 'Erro ao carregar capítulo'
       );
     } finally {
       setLoading(false);
@@ -99,153 +85,58 @@ export function BibleReader({
   }
 
   async function handleCopyText() {
-    try {
-      await navigator.clipboard.writeText(chapterText);
-      toast.success('Texto copiado com sucesso');
-    } catch {
-      toast.error('Erro ao copiar o texto');
-    }
+    await navigator.clipboard.writeText(chapterText);
+    toast.success('Texto copiado');
   }
 
   if (!isOpen) return null;
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/70 z-50" onClick={onClose} />
 
-      <div className="fixed inset-0 md:inset-4 md:max-w-4xl md:mx-auto md:my-auto bg-gradient-to-br from-[#0b1f2a] to-[#2a0f2f] border border-white/20 md:rounded-2xl shadow-2xl z-50 flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20">
-          <div className="flex items-center gap-3">
-            <BookOpen className="w-6 h-6 text-[#2FA4FF]" />
+      <div className="fixed inset-0 md:inset-4 md:max-w-4xl md:mx-auto bg-gradient-to-br from-[#0b1f2a] to-[#2a0f2f] border border-white/20 rounded-2xl z-50 flex flex-col">
+        <header className="p-4 border-b border-white/10 flex justify-between">
+          <div className="flex gap-3 items-center">
+            <BookOpen className="text-blue-400" />
             <div>
-              <h2 className="text-lg">
-                {book} {currentChapter}
-              </h2>
-              <p className="text-xs text-[#DADADA]">
+              <h2>{book} {currentChapter}</h2>
+              <p className="text-xs text-gray-300">
                 NVI – Nova Versão Internacional
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-1 bg-white/5 rounded-lg p-1">
-              <button
-                onClick={() => setFontSize(Math.max(12, fontSize - 2))}
-                className="p-1.5 hover:bg-white/10 rounded"
-                title="Diminuir fonte"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="text-xs px-2">{fontSize}px</span>
-              <button
-                onClick={() => setFontSize(Math.min(24, fontSize + 2))}
-                className="p-1.5 hover:bg-white/10 rounded"
-                title="Aumentar fonte"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-
-            <button
-              onClick={() => loadChapter(true)}
-              className="p-2 hover:bg-white/10 rounded"
-              disabled={loading}
-              title="Recarregar"
-            >
-              <RefreshCw
-                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
-              />
-            </button>
-
-            <button
-              onClick={handleCopyText}
-              disabled={!chapterText}
-              className="p-2 hover:bg-white/10 rounded"
-              title="Copiar"
-            >
-              <Copy className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={onMarkAsRead}
-              className={`px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${
-                isRead
-                  ? 'bg-green-500/20 text-green-400'
-                  : 'bg-white/5 hover:bg-white/10'
-              }`}
-              title={isRead ? 'Marcar como não lido' : 'Marcar como lido'}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              {isRead ? 'Lido' : 'Marcar'}
-            </button>
-
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded"
-              title="Fechar"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          <div className="flex gap-2">
+            <button onClick={() => setFontSize(f => Math.max(12, f - 2))}><Minus /></button>
+            <span>{fontSize}px</span>
+            <button onClick={() => setFontSize(f => Math.min(26, f + 2))}><Plus /></button>
+            <button onClick={loadChapter}><RefreshCw /></button>
+            <button onClick={handleCopyText}><Copy /></button>
+            <button onClick={onMarkAsRead}><CheckCircle2 /></button>
+            <button onClick={onClose}><X /></button>
           </div>
-        </div>
+        </header>
 
-        <div className="flex-1 overflow-y-auto p-6">
-          {loading && (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-[#2FA4FF] animate-spin" />
-              <span className="ml-3 text-[#DADADA]">
-                Carregando capítulo...
-              </span>
-            </div>
-          )}
-
-          {error && (
-            <div className="p-6 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400">
-              {error}
-            </div>
-          )}
-
-          {!loading && !error && chapterText && (
-            <div
-              className="max-w-3xl mx-auto whitespace-pre-wrap text-[#DADADA]"
-              style={{ fontSize, lineHeight: 1.8 }}
-            >
+        <main className="flex-1 p-6 overflow-y-auto">
+          {loading && <Loader2 className="animate-spin" />}
+          {error && <p className="text-red-400">{error}</p>}
+          {!loading && !error && (
+            <pre style={{ fontSize, lineHeight: 1.8 }} className="whitespace-pre-wrap">
               {chapterText}
-            </div>
+            </pre>
           )}
-        </div>
+        </main>
 
-        <div className="flex items-center justify-between p-4 border-t border-white/10 bg-black/20">
-          <button
-            onClick={() =>
-              currentChapter > 1 && setCurrentChapter(currentChapter - 1)
-            }
-            disabled={currentChapter === 1}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded disabled:opacity-30"
-            title="Anterior"
-          >
-            <ChevronLeft className="w-4 h-4" />
+        <footer className="p-4 border-t border-white/10 flex justify-between">
+          <button onClick={() => setCurrentChapter(c => Math.max(1, c - 1))}>
+            <ChevronLeft /> Anterior
           </button>
-
-          <span className="text-sm text-[#DADADA]">
-            Capítulo {currentChapter} de {totalChapters}
-          </span>
-
-          <button
-            onClick={() =>
-              currentChapter < totalChapters &&
-              setCurrentChapter(currentChapter + 1)
-            }
-            disabled={currentChapter === totalChapters}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded disabled:opacity-30"
-            title="Próximo"
-          >
-            <ChevronRight className="w-4 h-4" />
+          <span>Capítulo {currentChapter} de {totalChapters}</span>
+          <button onClick={() => setCurrentChapter(c => Math.min(totalChapters, c + 1))}>
+            Próximo <ChevronRight />
           </button>
-        </div>
+        </footer>
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, BookOpen, Loader2, CheckCircle2, RefreshCw, Copy, Plus, Minus, AlertCircle } from 'lucide-react';
-import { fetchBibleChapter, validateBibleText, ValidationResult } from '../utils/geminiApi';
+import { fetchBibleChapter } from '../utils/bibleApi';
 import { toast } from 'sonner@2.0.3';
 
 interface BibleReaderProps {

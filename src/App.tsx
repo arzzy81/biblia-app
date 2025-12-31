@@ -194,7 +194,7 @@ export default function App() {
       <main className={`px-4 md:px-12 lg:px-20 pt-[calc(84px+env(safe-area-inset-top))] md:pt-32 pb-20 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
         <header className="mb-12 md:mb-16 max-w-2xl">
-          <h1 className="text-[68px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
+          <h1 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
             <br />
             Um dia por vez. <br />
             Um texto por dia.  <br />
@@ -209,7 +209,7 @@ export default function App() {
           <p className="text-[60px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">
             Progresso de Leitura
           </p>
-          <h2 className="text-[80px] md:text-[140px]  bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black" style={{ fontFamily: "'Crimson Text', serif" }}>
+          <h2 className="text-[126px] md:text-[260px]  bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black" style={{ fontFamily: "'Crimson Text', serif" }}>
           {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
           </h2>
         </div>

@@ -139,10 +139,14 @@ export default function App() {
   const readingPercentage = totalChapters > 0 ? Math.round((readChaptersCount / totalChapters) * 100) : 0;
   const dailyReading = getReadingForDay(selectedDay);
 
-  const handleReadNow = (book: string, chapter: number, totalChaps: number) => {
-    setReaderBook(book);
+  // AJUSTE AQUI: Busca o total real de capítulos do livro na lista 'books'
+  const handleReadNow = (bookName: string, chapter: number) => {
+    const bookInfo = books.find(b => b.name === bookName);
+    const actualTotal = bookInfo ? bookInfo.chapters : 1;
+    
+    setReaderBook(bookName);
     setReaderChapter(chapter);
-    setReaderTotalChapters(totalChaps);
+    setReaderTotalChapters(actualTotal);
     setIsReaderOpen(true);
   };
 
@@ -150,9 +154,6 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white">
       <Toaster position="top-center" theme="dark" />
       
-      {/* ESTE É O SEGREDO: A div abaixo envolve todo o conteúdo e 
-          fica embaçada quando o leitor está aberto.
-      */}
       <div className={`px-4 md:px-12 lg:px-20 py-8 md:py-16 transition-all duration-500 ${isReaderOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
         <header className="mb-12 md:mb-16 max-w-2xl">

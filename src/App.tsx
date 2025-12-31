@@ -1,23 +1,39 @@
 import { useState, useEffect } from 'react';
-// ... outros imports (BookCard, DailyReadingCard, etc)
+import { Toaster } from 'sonner';
+import { Settings, Book as BibleIcon } from 'lucide-react';
+import { getDayOfYear, getReadingForDay } from './utils/readingPlan';
+
+// Importe seus componentes garantindo que os caminhos estão corretos
+import { BookCard } from './components/BookCard';
+import { DailyReadingCard } from './components/DailyReadingCard';
+import { SettingsPanel } from './components/SettingsPanel';
+import { BibleReader } from './components/BibleReader';
+import { BibleLibrary } from './components/BibleLibrary';
 
 export default function App() {
-  // ... seus estados (readChapters, userName, etc)
+  const [readChapters, setReadChapters] = useState<Record<string, Set<number>>>({});
+  const [userName, setUserName] = useState('');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [isReaderOpen, setIsReaderOpen] = useState(false);
+  const [readerBook, setReaderBook] = useState('');
+  const [readerChapter, setReaderChapter] = useState(1);
+
+  // Prevenção de erro: Se o plano de leitura falhar, define um padrão
+  const currentDayReading = getReadingForDay(getDayOfYear()) || { chapters: [] };
 
   return (
-    /* 1. O container pai agora força o fundo escuro em toda a tela */
-    <div className="min-h-screen w-full bg-[#020617] text-white font-sans selection:bg-[#2FA4FF]/30">
+    /* O h-screen e o overflow-x-hidden garantem que o fundo escuro domine a tela */
+    <div className="min-h-screen w-full bg-[#020617] text-white overflow-x-hidden" style={{ fontFamily: "'Open Sans', sans-serif" }}>
       <Toaster position="top-center" theme="dark" />
       
-      {/* 2. CABEÇALHO ESTÁTICO COM GRADIENTE AZUL PETRÓLEO */}
-      <header className="w-full bg-gradient-to-r from-[#0b1f2a] via-[#122835] to-[#2a0f2f] border-b border-white/10 shadow-2xl">
-        <div className="max-w-4xl mx-auto px-6 py-12 flex flex-col items-center">
-          
-          {/* Botões Modernos e Centralizados */}
+      {/* HEADER: Agora com cores sólidas de fallback para evitar o branco se o gradiente falhar */}
+      <header className="w-full bg-[#0b1f2a] bg-gradient-to-r from-[#0b1f2a] to-[#2a0f2f] border-b border-white/10 shadow-2xl">
+        <div className="max-w-4xl mx-auto px-6 py-10 flex flex-col items-center">
           <div className="flex gap-4">
             <button 
               onClick={() => setIsLibraryOpen(true)}
-              className="flex items-center gap-2 px-8 py-3 rounded-xl bg-white/5 hover:bg-[#2FA4FF]/20 text-[#2FA4FF] border border-white/10 transition-all active:scale-95 font-bold uppercase tracking-widest text-xs"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white/5 hover:bg-[#2FA4FF]/20 text-[#2FA4FF] border border-white/10 transition-all font-bold uppercase tracking-widest text-xs"
             >
               <BibleIcon size={18} />
               Bíblia
@@ -25,7 +41,7 @@ export default function App() {
 
             <button 
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-2 px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-all active:scale-95 font-bold uppercase tracking-widest text-xs"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-all font-bold uppercase tracking-widest text-xs"
             >
               <Settings size={18} />
               Ajustes
@@ -34,47 +50,69 @@ export default function App() {
         </div>
       </header>
 
-      {/* 3. CONTEÚDO PRINCIPAL (COM MARGEM DO TOPO AUTOMÁTICA) */}
-      <main className={`max-w-4xl mx-auto px-6 py-16 space-y-24 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-xl opacity-20' : 'opacity-100'}`}>
+      {/* CONTEÚDO: Ajustado para não sumir */}
+      <main className="max-w-4xl mx-auto px-6 py-16">
         
-        {/* Boas Vindas */}
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-6xl font-light leading-tight text-slate-100">
+        {/* TÍTULO INICIAL DIAGRAMADO */}
+        <div className="mb-20">
+          <h1 className="text-4xl md:text-5xl font-light leading-tight text-white mb-4">
             Um dia por vez. <br />
             Um texto por dia. <br />
-            <span className="font-extrabold text-[#2FA4FF] drop-shadow-sm">Uma vida transformada.</span>
+            <span className="font-extrabold text-[#2FA4FF]">Uma vida transformada.</span>
           </h1>
-          <p className="text-slate-500 text-lg md:text-xl font-medium max-w-xl">
-            Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
+          <p className="text-gray-500 text-lg">
+            A constância na leitura renova o entendimento.
           </p>
         </div>
 
-        {/* Progresso Total Centralizado */}
-        <div className="py-10 flex flex-col items-center justify-center relative">
-          <div className="text-[120px] md:text-[180px] font-black text-white/[0.02] leading-none absolute select-none">
-            {readingPercentage}%
-          </div>
-          <p className="text-xs tracking-[0.6em] text-[#2FA4FF] uppercase font-black mb-2 relative z-10">
-            Seu progresso total
-          </p>
-          <h2 className="text-6xl md:text-8xl font-bold text-white relative z-10">
-            {readingPercentage}<span className="text-[#2FA4FF] text-4xl">%</span>
-          </h2>
+        {/* PROGRESSO */}
+        <div className="flex flex-col items-center mb-24 py-10 border-y border-white/5">
+           <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] uppercase font-black mb-2">
+              Progresso de Leitura
+           </p>
+           <h2 className="text-7xl font-bold text-white">0%</h2>
         </div>
 
-        {/* Plano de Leitura */}
-        <DailyReadingCard
-          currentDay={getDayOfYear()}
-          dailyReading={getReadingForDay(getDayOfYear())}
-          // ... props restantes
-        />
-
-        {/* Listas de Livros renderizadas aqui... */}
+        {/* ÁREA DO CARD DO DIA */}
+        <div className="bg-white/5 rounded-3xl p-1 border border-white/10">
+          <DailyReadingCard
+            currentDay={getDayOfYear()}
+            dailyReading={currentDayReading}
+            onDayChange={() => {}}
+            readChapters={readChapters}
+            onToggleChapter={() => {}}
+            onReadNow={() => {}}
+          />
+        </div>
       </main>
 
-      {/* Modais/Drawer */}
-      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      <BibleLibrary isOpen={isLibraryOpen} onClose={() => setIsLibraryOpen(false)} />
+      {/* COMPONENTES DE INTERFACE (Modais) */}
+      <SettingsPanel 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        userName={userName} 
+        onUserNameChange={setUserName} 
+      />
+      
+      <BibleLibrary 
+        isOpen={isLibraryOpen} 
+        onClose={() => setIsLibraryOpen(false)} 
+        books={[]} 
+        onSelectChapter={() => {}} 
+      />
+
+      {/* O Reader só renderiza se estiver aberto para evitar erros de API/Nulo */}
+      {isReaderOpen && (
+        <BibleReader 
+          isOpen={isReaderOpen} 
+          onClose={() => setIsReaderOpen(false)} 
+          book={readerBook} 
+          chapter={readerChapter} 
+          totalChapters={1} 
+          isRead={false} 
+          onMarkAsRead={() => {}} 
+        />
+      )}
     </div>
   );
 }

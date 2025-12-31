@@ -231,6 +231,7 @@ export default function App() {
               {oldTestamentBooks.map((book) => (<BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
             </div>
+            <br />
           </section>
 
           <section>

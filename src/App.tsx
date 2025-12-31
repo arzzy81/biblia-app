@@ -155,40 +155,42 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white flex flex-col font-sans overflow-x-hidden">
       <Toaster position="top-center" theme="dark" />
 
-      {/* --- HEADER FIXO SUPERIOR (Opção A) --- */}
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-black/40 backdrop-blur-xl border-b border-white/5 safe-top">
-        <div className="max-w-7xl mx-auto px-4 md:px-12 h-20 flex items-center justify-between">
-          {/* Logo ou Nome do App (Opcional) */}
-          <div className="hidden md:block font-serif italic text-lg opacity-80 tracking-tight">
-            Bible Life
+      {/* --- BARRA SUPERIOR (APP BAR) FULL-WIDTH --- */}
+      <header className="fixed top-0 left-0 right-0 w-full z-[100] bg-black/60 backdrop-blur-2xl border-b border-white/10 shadow-lg">
+        {/* Padding extra para Safe Area do iPhone (Notch) */}
+        <div className="pt-[env(safe-area-inset-top)]">
+          <div className="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
+            
+            {/* TÍTULO/LOGO À ESQUERDA */}
+            <div className="font-serif italic text-lg md:text-xl font-medium tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+              Bible Life
+            </div>
+
+            {/* BOTÕES DE NAVEGAÇÃO À DIREITA */}
+            <nav className="flex items-center gap-2 md:gap-4">
+              <button
+                onClick={() => setIsLibraryOpen(true)}
+                className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-[#2FA4FF]/10 text-[#2FA4FF] hover:bg-[#2FA4FF]/20 border border-[#2FA4FF]/20 transition-all active:scale-95 group"
+              >
+                <BibleIcon size={18} className="group-hover:rotate-12 transition-transform" />
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Bíblia</span>
+              </button>
+
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5 transition-all active:scale-95 group"
+              >
+                <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes</span>
+              </button>
+            </nav>
           </div>
-
-          {/* Navegação Principal */}
-          <nav className="flex items-center gap-3 p-1 bg-white/5 rounded-2xl border border-white/10 ml-auto mr-auto md:mr-0">
-            <button
-              onClick={() => setIsLibraryOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2FA4FF]/20 text-[#2FA4FF] hover:bg-[#2FA4FF]/30 transition-all active:scale-95 group"
-            >
-              <BibleIcon size={18} className="group-hover:rotate-12 transition-transform" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.15em]">Bíblia</span>
-            </button>
-
-            <div className="w-[1px] h-5 bg-white/10" />
-
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 transition-all active:scale-95 group"
-            >
-              <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.15em]">Ajustes</span>
-            </button>
-          </nav>
         </div>
       </header>
 
       {/* --- CONTEÚDO PRINCIPAL --- */}
-      {/* pt-32 garante que o texto comece abaixo do header fixo */}
-      <main className={`px-4 md:px-12 lg:px-20 pt-32 pb-20 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+      {/* pt-[calc(64px+env(safe-area-inset-top))] ajusta o padding conforme a altura da barra + notch */}
+      <main className={`px-4 md:px-12 lg:px-20 pt-[calc(84px+env(safe-area-inset-top))] md:pt-32 pb-20 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
         <header className="mb-12 md:mb-16 max-w-2xl">
           <h1 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>

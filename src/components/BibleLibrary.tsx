@@ -18,7 +18,6 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
-  // Filtra os livros conforme a pesquisa
   const filteredBooks = books.filter(book =>
     book.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -27,20 +26,18 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
 
   return (
     <>
-      {/* Overlay (Mesmo efeito de desfoque das configurações) */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
         onClick={() => {
           setSelectedBook(null);
           onClose();
         }}
       />
 
-      {/* Bible Panel (Mesmo estilo e gradiente do SettingsPanel) */}
       <div className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-gradient-to-br from-[#0b1f2a] to-[#2a0f2f] border-l border-white/20 shadow-2xl z-50 flex flex-col">
         
-        {/* Header (Mantendo o padrão Visual) */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-gradient-to-br from-[#0b1f2a] to-[#2a0f2f] z-10">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-[#0b1f2a] z-10">
           <h2 className="text-xl md:text-2xl flex items-center gap-3 font-semibold">
             <BibleIcon className="w-6 h-6 text-[#2FA4FF]" />
             {selectedBook ? selectedBook.name : 'Bíblia Completa'}
@@ -52,51 +49,51 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
             }}
             className="p-2 hover:bg-white/10 rounded-lg transition-colors"
           >
-            {selectedBook ? <ChevronRight className="w-5 h-5 rotate-180" /> : <X className="w-5 h-5" />}
+            {selectedBook ? <ChevronRight className="w-5 h-5 rotate-180 text-white/60" /> : <X className="w-5 h-5 text-white/60" />}
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
           {!selectedBook ? (
             <div className="space-y-6">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              {/* Search Bar Corrigida */}
+              <div className="relative flex items-center">
+                <Search className="absolute left-4 w-4 h-4 text-[#2FA4FF]" />
                 <input
                   type="text"
                   placeholder="Pesquisar livro..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-[#2FA4FF] transition-all"
+                  className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#2FA4FF]/50 focus:ring-1 focus:ring-[#2FA4FF]/20 transition-all"
                 />
               </div>
 
-              {/* Lista de Livros (Estilo Cards das Configurações) */}
+              {/* Lista de Livros */}
               <div className="grid grid-cols-1 gap-2">
                 {filteredBooks.map((book) => (
                   <button
                     key={book.name}
                     onClick={() => setSelectedBook(book)}
-                    className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-[#2FA4FF]/50 transition-all group"
+                    className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-[#2FA4FF]/30 transition-all group"
                   >
-                    <span className="text-[#DADADA] group-hover:text-white transition-colors">{book.name}</span>
-                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#2FA4FF]" />
+                    <span className="text-[#DADADA] group-hover:text-white font-medium">{book.name}</span>
+                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#2FA4FF] group-hover:translate-x-1 transition-all" />
                   </button>
                 ))}
               </div>
             </div>
           ) : (
             <div className="space-y-6">
-              <p className="text-sm text-[#DADADA] uppercase tracking-wider">Selecione o Capítulo:</p>
+              <p className="text-xs text-[#2FA4FF] uppercase tracking-[0.2em] font-bold">Capítulos</p>
               
-              {/* Grade de Capítulos (Estilo moderno e limpo) */}
-              <div className="grid grid-cols-5 gap-2">
+              {/* Grade de Capítulos Ajustada (Quadrados pequenos de ~44px) */}
+              <div className="grid grid-cols-6 sm:grid-cols-7 gap-2">
                 {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map((cap) => (
                   <button
                     key={cap}
                     onClick={() => onSelectChapter(selectedBook.name, cap)}
-                    className="aspect-square flex items-center justify-center bg-white/5 border border-white/10 rounded-lg text-sm hover:bg-gradient-to-r hover:from-[#2FA4FF] hover:to-[#8B5CF6] hover:border-transparent transition-all"
+                    className="w-full aspect-square flex items-center justify-center bg-white/5 border border-white/10 rounded-lg text-xs font-bold text-[#DADADA] hover:bg-gradient-to-r hover:from-[#2FA4FF] hover:to-[#8B5CF6] hover:text-white hover:border-transparent hover:shadow-[0_0_15px_rgba(47,164,255,0.3)] transition-all active:scale-90"
                   >
                     {cap}
                   </button>
@@ -106,11 +103,12 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
           )}
         </div>
 
-        {/* Footer Informativo (Mesmo estilo do final das configurações) */}
+        {/* Footer */}
         <div className="p-6 border-t border-white/10 bg-black/20">
-           <div className="p-4 bg-[#2FA4FF]/10 rounded-lg border border-[#2FA4FF]/30">
-              <p className="text-[11px] text-[#DADADA] leading-relaxed">
-                💡 <strong>Dica:</strong> Selecione um livro e o capítulo desejado para abrir o leitor digital imersivo.
+           <div className="p-4 bg-[#2FA4FF]/5 rounded-xl border border-[#2FA4FF]/20">
+              <p className="text-[11px] text-[#DADADA]/80 leading-relaxed flex gap-2">
+                <span className="text-[#2FA4FF]">💡</span>
+                <span>Selecione um livro e o capítulo desejado para iniciar sua leitura imersiva.</span>
               </p>
            </div>
         </div>

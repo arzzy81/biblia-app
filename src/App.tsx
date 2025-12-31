@@ -196,7 +196,7 @@ export default function App() {
           <h1 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
             Um dia por vez.<br /> 
             Um texto por dia.<br /> 
-            <span className="font-bold text-[#2FA4FF] not-italic">Uma vida transformada.</span>
+            Uma vida transformada.<br />
           </h1>
           <p className="text-[14px] md:text-[18px] text-[#DADADA] border-l-2 border-[#2FA4FF]/30 pl-6">
             Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...

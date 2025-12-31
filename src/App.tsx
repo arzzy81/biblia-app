@@ -120,25 +120,23 @@ export default function App() {
       const newState = { ...prev };
       if (!newState[bookName]) newState[bookName] = new Set();
       else newState[bookName] = new Set(newState[bookName]);
-      
       const wasRead = newState[bookName].has(chapter);
       if (wasRead) newState[bookName].delete(chapter);
       else newState[bookName].add(chapter);
-      
       const book = books.find(b => b.name === bookName);
       if (book && !wasRead && newState[bookName].size === book.chapters) {
-        toast.success('🎉 Parabéns!', {
-          description: `Você completou o livro de ${bookName}!`,
-        });
+        toast.success('🎉 Parabéns!', { description: `Você completou o livro de ${bookName}!` });
       }
       saveProgress(newState);
       return newState;
     });
   };
 
-  const totalChaptersCount = books.reduce((sum, book) => sum + book.chapters, 0);
+  const oldTestamentBooks = books.filter(b => b.testament === "old");
+  const newTestamentBooks = books.filter(b => b.testament === "new");
+  const totalChapters = books.reduce((sum, book) => sum + book.chapters, 0);
   const readChaptersCount = Object.values(readChapters).reduce((sum, set) => sum + set.size, 0);
-  const readingPercentage = totalChaptersCount > 0 ? Math.round((readChaptersCount / totalChaptersCount) * 100) : 0;
+  const readingPercentage = totalChapters > 0 ? Math.round((readChaptersCount / totalChapters) * 100) : 0;
   const dailyReading = getReadingForDay(selectedDay);
 
   const handleReadNow = (book: string, chapter: number, totalChaps: number) => {
@@ -149,67 +147,65 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b1f2a] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white">
       <Toaster position="top-center" theme="dark" />
       
-      {/* BACKGROUND GRADIENT */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] -z-10" />
+      {/* ESTE É O SEGREDO: A div abaixo envolve todo o conteúdo e 
+          fica embaçada quando o leitor está aberto.
+      */}
+      <div className={`px-4 md:px-12 lg:px-20 py-8 md:py-16 transition-all duration-500 ${isReaderOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+        
+        <header className="mb-12 md:mb-16 max-w-2xl">
+          <h1 className="text-[28px] md:text-[46px] leading-[1.2] mb-4 md:mb-6" style={{ fontFamily: "'Crimson Text', serif" }}>
+            Um dia por vez.<br /> Um texto por dia.<br /> Uma vida transformada.
+          </h1>
+          <p className="text-[14px] md:text-[18px] text-[#DADADA]">
+            Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
+          </p>
+        </header>
 
-      {/* MAIN CONTENT WRAPPER - Aqui aplicamos o desfoque Apple quando o leitor abrir */}
-      <div className={`transition-all duration-500 ${isReaderOpen ? 'blur-xl scale-95 opacity-30 pointer-events-none' : 'blur-0'}`}>
-        <div className="px-4 md:px-12 lg:px-20 py-8 md:py-16">
-          
-          <header className="mb-12 md:mb-16 max-w-2xl">
-            <h1 className="text-[28px] md:text-[46px] leading-[1.2] mb-4 md:mb-6" style={{ fontFamily: "'Crimson Text', serif" }}>
-              Um dia por vez.<br />
-              Um texto por dia.<br />
-              Uma vida transformada.
-            </h1>
-            <p className="text-[14px] md:text-[18px] leading-[1.5] text-[#DADADA]">
-              Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
-            </p>
-          </header>
+        <div className="text-center mb-12 md:mb-20 relative">
+          <h2 className="text-[36px] md:text-[72px] mb-3 md:mb-4 bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent" style={{ fontFamily: "'Crimson Text', serif" }}>
+            {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
+          </h2>
+          <button onClick={() => setIsSettingsOpen(true)} className="absolute top-0 right-0 p-3 hover:bg-white/10 rounded-lg">
+            <Settings className="w-6 h-6 text-[#2FA4FF]" />
+          </button>
+        </div>
 
-          <div className="text-center mb-12 md:mb-20 relative">
-            <h2 className="text-[36px] md:text-[72px] mb-3 md:mb-4 bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent leading-tight" style={{ fontFamily: "'Crimson Text', serif" }}>
-              {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
-            </h2>
-            <button onClick={() => setIsSettingsOpen(true)} className="absolute top-0 right-0 p-3 hover:bg-white/10 rounded-lg">
-              <Settings className="w-6 h-6 text-[#2FA4FF]" />
-            </button>
-          </div>
+        <div className="mb-12 md:mb-20">
+          <DailyReadingCard
+            currentDay={selectedDay}
+            dailyReading={dailyReading}
+            onDayChange={setSelectedDay}
+            readChapters={readChapters}
+            onToggleChapter={toggleChapter}
+            onReadNow={handleReadNow}
+          />
+        </div>
 
-          <div className="mb-12 md:mb-20">
-            <DailyReadingCard
-              currentDay={selectedDay}
-              dailyReading={dailyReading}
-              onDayChange={setSelectedDay}
-              readChapters={readChapters}
-              onToggleChapter={toggleChapter}
-              onReadNow={handleReadNow}
-            />
-          </div>
+        <div className="space-y-20">
+          <section>
+            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Antigo Testamento</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {oldTestamentBooks.map((book) => (
+                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
+              ))}
+            </div>
+          </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {books.map((book) => (
-              <BookCard
-                key={book.name}
-                book={book}
-                readChapters={readChapters[book.name] || new Set()}
-                onToggleChapter={(chapter) => toggleChapter(book.name, chapter)}
-                onReadNow={handleReadNow}
-              />
-            ))}
-          </div>
+          <section>
+            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Novo Testamento</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newTestamentBooks.map((book) => (
+                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
+              ))}
+            </div>
+          </section>
         </div>
       </div>
 
-      <SettingsPanel
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        userName={userName}
-        onUserNameChange={(name) => { setUserName(name); localStorage.setItem('bibleUserName', name); }}
-      />
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userName={userName} onUserNameChange={(n) => { setUserName(n); localStorage.setItem('bibleUserName', n); }} />
 
       <BibleReader
         isOpen={isReaderOpen}

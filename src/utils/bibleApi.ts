@@ -8,7 +8,8 @@ export interface BibleBook {
 
 let cachedBible: BibleBook[] | null = null;
 
-function normalize(text: string): string {
+// Função para remover acentos e espaços
+function normalizeText(text: string): string {
   if (!text) return "";
   return text
     .toLowerCase()
@@ -18,12 +19,13 @@ function normalize(text: string): string {
     .trim();
 }
 
-const bookMap: Record<string, string> = {
+// Mapa de tradução: Nome do Plano -> Abreviação do seu nvi.json
+const nameToAbbrev: Record<string, string> = {
   "genesis": "gn", "exodo": "ex", "levitico": "lv", "numeros": "nm", "deuteronomio": "dt",
   "josue": "js", "juizes": "jz", "rute": "rt", "1samuel": "1sm", "2samuel": "2sm",
   "1reis": "1re", "2reis": "2re", "1cronicas": "1cr", "2cronicas": "2cr",
   "esdras": "ez", "neemias": "ne", "ester": "et", "jo": "jo", "salmos": "sl",
-  "proverbios": "pv", "eclesiastes": "ec", "canticos": "ct", "isaias": "is",
+  "proverbios": "pv", "eclesiastes": "ec", "canticodoscanticos": "ct", "isaias": "is",
   "jeremias": "jr", "lamentacoes": "lm", "ezequiel": "ez", "daniel": "dn",
   "oseias": "os", "joel": "jl", "amos": "am", "obadias": "ob", "jonas": "jn",
   "miqueias": "mq", "naum": "na", "habacuque": "hc", "sofonias": "sf",
@@ -39,17 +41,18 @@ const bookMap: Record<string, string> = {
 export async function fetchBibleChapter(bookName: string, chapter: number): Promise<string> {
   if (!cachedBible) {
     const res = await fetch('/nvi.json');
-    if (!res.ok) throw new Error('Não foi possível carregar a Bíblia.');
+    if (!res.ok) throw new Error('Não foi possível carregar o arquivo da Bíblia.');
     cachedBible = await res.json();
   }
 
-  const target = normalize(bookName);
-  const targetAbbrev = bookMap[target];
+  const search = normalizeText(bookName);
+  const targetAbbrev = nameToAbbrev[search];
 
+  // Procura no array do JSON
   const book = cachedBible?.find(b => 
-    normalize(b.name) === target || 
-    normalize(b.abbrev) === target ||
-    normalize(b.abbrev) === targetAbbrev
+    normalizeText(b.abbrev) === targetAbbrev || 
+    normalizeText(b.name) === search ||
+    normalizeText(b.abbrev) === search
   );
 
   if (!book) throw new Error(`Livro não encontrado: ${bookName}`);

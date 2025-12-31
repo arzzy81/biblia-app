@@ -27,12 +27,10 @@ export function BibleReader({
   const [error, setError] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState(18);
 
-  // Atualiza o capítulo quando o modal abre
   useEffect(() => {
     if (isOpen) setCurrentChapter(chapter);
   }, [isOpen, chapter]);
 
-  // Carrega o texto da Bíblia
   useEffect(() => {
     if (isOpen) {
       const load = async () => {
@@ -54,73 +52,78 @@ export function BibleReader({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black">
-      {/* Container Principal - Fundo Preto Sólido */}
-      <div className="relative w-full h-full max-w-4xl bg-black flex flex-col overflow-hidden md:border-x md:border-white/10">
+    // CAMADA 1: Ocupa a tela toda. O fundo é preto sólido para garantir que NADA do app apareça.
+    <div className="fixed inset-0 z-[10000] bg-black flex items-center justify-center">
+      
+      {/* CAMADA 2: O quadro de leitura. Ele tem uma cor sólida (não transparente). */}
+      <div className="relative w-full h-full max-w-4xl bg-[#0b1f2a] flex flex-col shadow-2xl">
         
-        {/* Header - Fundo Escuro Sólido */}
-        <header className="p-4 border-b border-white/10 flex justify-between items-center bg-[#0b1f2a]">
+        {/* CABEÇALHO: Fundo sólido para não vazar texto */}
+        <header className="p-4 border-b border-white/10 flex justify-between items-center bg-[#162c38]">
           <div className="flex items-center gap-3">
             <BookOpen className="text-blue-400" size={24} />
             <div>
               <h2 className="text-white font-bold text-lg leading-none">{book} {currentChapter}</h2>
-              <p className="text-[10px] text-gray-500 uppercase mt-1">NVI - Nova Versão Internacional</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Leitura Oficial NVI</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-white/10 rounded text-gray-400" onClick={() => setFontSize(s => Math.max(12, s-2))}><Minus size={18}/></button>
-            <button className="p-2 hover:bg-white/10 rounded text-gray-400" onClick={() => setFontSize(s => Math.min(32, s+2))}><Plus size={18}/></button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center bg-black/30 rounded-lg p-1">
+              <button className="p-2 hover:bg-white/10 text-gray-400" onClick={() => setFontSize(s => Math.max(12, s-2))}><Minus size={18}/></button>
+              <button className="p-2 hover:bg-white/10 text-gray-400" onClick={() => setFontSize(s => Math.min(32, s+2))}><Plus size={18}/></button>
+            </div>
+            
             <button 
-              className={`p-2 rounded transition-colors ${isRead ? 'text-green-400' : 'text-gray-400'}`} 
+              className={`p-2 transition-colors ${isRead ? 'text-green-400' : 'text-gray-500'}`}
               onClick={onMarkAsRead}
             >
-              <CheckCircle2 size={24} className={isRead ? "fill-green-400/20" : ""} />
+              <CheckCircle2 size={26} className={isRead ? "fill-green-400/20" : ""} />
             </button>
-            <button className="p-2 hover:bg-red-500/20 text-white ml-2" onClick={onClose}>
-              <X size={28}/>
+
+            <button className="p-2 text-white/70 hover:text-white" onClick={onClose}>
+              <X size={30}/>
             </button>
           </div>
         </header>
 
-        {/* Área do Texto - Fundo Preto Sólido */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-12 bg-black">
+        {/* ÁREA DO TEXTO: Aqui é o segredo. Fundo TOTALMENTE SÓLIDO. */}
+        <main className="flex-1 overflow-y-auto p-6 md:p-16 bg-[#0b1f2a]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <Loader2 className="animate-spin text-blue-400" size={40} />
-              <p className="text-gray-500 text-sm">Carregando capítulo...</p>
+            <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-400">
+              <Loader2 className="animate-spin" size={40} />
+              <p>Buscando escrituras...</p>
             </div>
           ) : error ? (
-            <div className="flex items-center justify-center h-full p-6 text-center">
-              <div className="text-red-400 border border-red-500/20 p-4 rounded bg-red-500/5">
-                {error}
-              </div>
+            <div className="text-center p-10 text-red-400 bg-red-900/10 rounded-xl border border-red-900/20">
+              {error}
             </div>
           ) : (
             <div 
               style={{ fontSize: `${fontSize}px` }} 
-              className="text-gray-200 leading-[1.8] font-serif whitespace-pre-wrap max-w-2xl mx-auto pb-20"
+              className="text-gray-100 leading-[1.8] font-serif whitespace-pre-wrap max-w-2xl mx-auto pb-32"
             >
+              {/* O texto agora está sobre um fundo azul-petróleo escuro totalmente sólido */}
               {chapterText}
             </div>
           )}
         </main>
 
-        {/* Footer - Fundo Escuro Sólido */}
-        <footer className="p-4 border-t border-white/10 flex justify-between items-center bg-[#0b1f2a]">
+        {/* RODAPÉ: Fundo sólido */}
+        <footer className="p-4 border-t border-white/10 flex justify-between items-center bg-[#162c38]">
           <button 
             disabled={currentChapter <= 1}
             onClick={() => {
               setCurrentChapter(c => c - 1);
               document.querySelector('main')?.scrollTo(0,0);
             }}
-            className="flex items-center gap-2 text-sm text-gray-400 disabled:opacity-20 px-3 py-2"
+            className="flex items-center gap-2 text-sm text-gray-300 disabled:opacity-20 px-4 py-2 bg-black/20 rounded-lg"
           >
             <ChevronLeft size={20} /> Anterior
           </button>
           
-          <span className="text-xs text-gray-500 font-medium">
-            CAPÍTULO {currentChapter} DE {totalChapters}
+          <span className="text-xs font-bold text-blue-400 uppercase tracking-tighter">
+            Capítulo {currentChapter} de {totalChapters}
           </span>
 
           <button 
@@ -129,7 +132,7 @@ export function BibleReader({
               setCurrentChapter(c => c + 1);
               document.querySelector('main')?.scrollTo(0,0);
             }}
-            className="flex items-center gap-2 text-sm text-gray-400 disabled:opacity-20 px-3 py-2"
+            className="flex items-center gap-2 text-sm text-gray-300 disabled:opacity-20 px-4 py-2 bg-black/20 rounded-lg"
           >
             Próximo <ChevronRight size={20} />
           </button>

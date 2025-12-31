@@ -31,7 +31,7 @@ export function BibleReader({
   useEffect(() => {
     if (isOpen) {
       setCurrentChapter(chapter);
-      document.body.style.overflow = 'hidden'; // Trava o scroll do fundo
+      document.body.style.overflow = 'hidden'; 
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -55,20 +55,36 @@ export function BibleReader({
     }
   };
 
+  // Função para diagramar o texto: Transforma números de versículos em quebras de linha
+  const renderFormattedText = (text: string) => {
+    // Esta regex identifica números no início ou meio do texto (ex: "1 No princípio...")
+    const verses = text.split(/(\d+)/g);
+    const elements = [];
+    
+    for (let i = 1; i < verses.length; i += 2) {
+      const number = verses[i];
+      const content = verses[i + 1];
+      elements.push(
+        <div key={i} className="mb-4 flex gap-4 items-start">
+          <span className="text-[#2FA4FF] font-sans font-bold text-sm mt-1 min-w-[20px]">{number}</span>
+          <span className="flex-1 text-[#e2e8f0]">{content}</span>
+        </div>
+      );
+    }
+    return elements.length > 0 ? elements : text;
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-0 md:p-4 lg:p-10">
-      {/* 1. FUNDO PRETO TOTAL - Bloqueia a visão do que está atrás */}
       <div 
         className="absolute inset-0 bg-black/98 backdrop-blur-sm" 
         onClick={onClose} 
       />
 
-      {/* 2. JANELA FLUTUANTE - Cor Sólida, Sem Transparência */}
       <div className="relative w-full h-full max-w-5xl bg-[#0b161d] shadow-[0_0_60px_rgba(0,0,0,1)] md:rounded-2xl flex flex-col overflow-hidden border border-white/10">
         
-        {/* CABEÇALHO SÓLIDO */}
         <div className="flex items-center justify-between p-4 md:p-6 bg-[#122835] border-b border-white/5">
           <div className="flex items-center gap-4">
             <BookOpen className="w-6 h-6 text-[#2FA4FF]" />
@@ -95,8 +111,7 @@ export function BibleReader({
           </div>
         </div>
 
-        {/* CORPO DO TEXTO - FUNDO TOTALMENTE OPACO */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-12 bg-[#0b161d]">
+        <div className="flex-1 overflow-y-auto p-6 md:p-12 bg-[#0b161d] custom-scrollbar">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full">
               <Loader2 className="animate-spin text-[#2FA4FF] mb-4" size={40} />
@@ -108,16 +123,17 @@ export function BibleReader({
               <button onClick={() => loadChapter(true)} className="px-6 py-2 bg-white/10 rounded-lg text-sm">Tentar Novamente</button>
             </div>
           ) : (
-            <div 
-              className="max-w-3xl mx-auto text-[#e2e8f0] font-serif leading-[1.9]"
-              style={{ fontSize: `${fontSize}px` }}
-            >
-              {chapterText}
+            <div className="max-w-3xl mx-auto">
+              <div 
+                className="font-serif leading-[1.8]"
+                style={{ fontSize: `${fontSize}px` }}
+              >
+                {renderFormattedText(chapterText)}
+              </div>
             </div>
           )}
         </div>
 
-        {/* RODAPÉ SÓLIDO */}
         <div className="p-4 md:p-6 bg-[#122835] border-t border-white/5 flex justify-between items-center">
           <button 
             onClick={() => setCurrentChapter(c => Math.max(1, c-1))}

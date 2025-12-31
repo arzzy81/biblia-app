@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, BookOpen, Loader2, CheckCircle2, RefreshCw, Copy, Plus, Minus } from 'lucide-react';
-import { fetchBibleChapter } from '../utils/bibleApi'; // Ajustado para o seu utilitário real
+import { fetchBibleChapter, validateBibleText } from '../utils/geminiApi';
 import { toast } from 'sonner';
 
 interface BibleReaderProps {
@@ -29,21 +29,50 @@ export function BibleReader({
   const [fontSize, setFontSize] = useState(18);
 
   useEffect(() => {
-    if (isOpen) setCurrentChapter(chapter);
+    if (isOpen) {
+      setCurrentChapter(chapter);
+    }
   }, [isOpen, book, chapter]);
 
   useEffect(() => {
-    if (isOpen) loadChapter();
+    if (isOpen) {
+      loadChapter();
+    }
   }, [isOpen, currentChapter]);
 
-  const loadChapter = async () => {
+  const getCacheKey = () => `bible_cache_${book}_${currentChapter}`;
+
+  const loadChapter = async (forceReload = false) => {
     setLoading(true);
     setError(null);
+
     try {
+      if (!forceReload) {
+        const cached = localStorage.getItem(getCacheKey());
+        if (cached) {
+          const { text, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < 604800000) { // 7 dias
+            setChapterText(text);
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
       const text = await fetchBibleChapter(book, currentChapter);
-      setChapterText(text);
+      const validationResult = validateBibleText(text);
+      
+      if (!validationResult.isValid && validationResult.error) {
+        setError(validationResult.error);
+      } else {
+        setChapterText(text);
+        localStorage.setItem(getCacheKey(), JSON.stringify({
+          text,
+          timestamp: Date.now(),
+        }));
+      }
     } catch (err) {
-      setError('Erro ao carregar capítulo');
+      setError(err instanceof Error ? err.message : 'Erro na conexao com o servidor');
     } finally {
       setLoading(false);
     }
@@ -52,7 +81,7 @@ export function BibleReader({
   const handleCopyText = async () => {
     try {
       await navigator.clipboard.writeText(chapterText);
-      toast.success('Copiado!');
+      toast.success('Texto copiado');
     } catch (err) {
       toast.error('Erro ao copiar');
     }
@@ -62,62 +91,79 @@ export function BibleReader({
 
   return (
     <>
-      {/* 1. OVERLAY: Escurece o fundo completamente para isolar a janela */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] transition-opacity"
+        className="fixed inset-0 bg-black/95 z-[100]"
         onClick={onClose}
       />
 
-      {/* 2. JANELA FLUTUANTE (Reader Panel) */}
-      <div className="fixed inset-0 md:inset-x-4 md:inset-y-10 md:max-w-4xl md:mx-auto bg-[#0b1f2a] border border-white/10 md:rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] z-[101] flex flex-col overflow-hidden">
+      <div className="fixed inset-0 md:inset-4 lg:inset-10 md:max-w-5xl md:mx-auto bg-[#0b161d] border border-white/10 md:rounded-2xl shadow-2xl z-[101] flex flex-col overflow-hidden">
         
-        {/* HEADER: Fundo sólido para não vazar o texto de fundo */}
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10 bg-[#162c38]">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/5 bg-[#122835]">
+          <div className="flex items-center gap-4">
             <BookOpen className="w-6 h-6 text-[#2FA4FF]" />
             <div>
-              <h2 className="text-lg md:text-xl font-bold text-white">
+              <h2 className="text-lg md:text-xl font-bold text-white leading-tight">
                 {book} {currentChapter}
               </h2>
-              <p className="text-[10px] text-blue-300/60 uppercase tracking-widest">
-                NVI - Tradução Oficial
+              <p className="text-[10px] text-blue-300/40 uppercase tracking-widest mt-1">
+                ARC - Almeida Revista e Corrigida
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 bg-black/20 rounded-lg p-1">
-              <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-1.5 hover:bg-white/10 rounded"><Minus className="w-4 h-4" /></button>
-              <button onClick={() => setFontSize(Math.min(30, fontSize + 2))} className="p-1.5 hover:bg-white/10 rounded"><Plus className="w-4 h-4" /></button>
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="hidden md:flex items-center gap-1 bg-black/40 rounded-xl p-1 border border-white/5">
+              <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-1.5 hover:bg-white/10 rounded-lg"><Minus size={16} /></button>
+              <span className="text-[10px] font-bold px-2 text-gray-500">{fontSize}PX</span>
+              <button onClick={() => setFontSize(Math.min(32, fontSize + 2))} className="p-1.5 hover:bg-white/10 rounded-lg"><Plus size={16} /></button>
             </div>
 
-            <button onClick={() => loadChapter()} className="p-2 hover:bg-white/10 rounded-lg text-gray-400"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /></button>
-            <button onClick={handleCopyText} className="p-2 hover:bg-white/10 rounded-lg text-gray-400"><Copy className="w-4 h-4" /></button>
-            
-            <button
-              onClick={onMarkAsRead}
-              className={`p-2 rounded-lg transition-all ${isRead ? 'text-green-400' : 'text-gray-400'}`}
-            >
-              <CheckCircle2 className={`w-6 h-6 ${isRead ? 'fill-green-400/20' : ''}`} />
+            <button onClick={() => loadChapter(true)} className="p-2 text-gray-400 hover:text-white transition-colors">
+              <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             </button>
 
-            <button onClick={onClose} className="p-2 hover:bg-red-500/20 text-white rounded-lg"><X className="w-6 h-6" /></button>
+            <button onClick={handleCopyText} className="p-2 text-gray-400 hover:text-white transition-colors">
+              <Copy size={18} />
+            </button>
+
+            <button
+              onClick={onMarkAsRead}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                isRead 
+                  ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                  : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
+              }`}
+            >
+              <CheckCircle2 size={16} />
+              <span className="hidden sm:inline">{isRead ? 'LIDO' : 'MARCAR'}</span>
+            </button>
+
+            <button onClick={onClose} className="p-2 text-gray-400 hover:text-white transition-colors">
+              <X size={28} />
+            </button>
           </div>
         </div>
 
-        {/* CONTENT: Área do texto com fundo SÓLIDO */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-12 bg-[#0b1f2a] custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 md:p-16 bg-[#0b161d]">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <Loader2 className="w-10 h-10 text-[#2FA4FF] animate-spin" />
-              <span className="text-gray-500 text-xs tracking-widest">CARREGANDO...</span>
+              <p className="text-[10px] tracking-[0.2em] text-blue-300/20 uppercase font-bold">Aguarde</p>
             </div>
           ) : error ? (
-            <div className="text-center text-red-400 p-10">{error}</div>
+            <div className="max-w-md mx-auto text-center p-12 bg-black/20 border border-white/5 rounded-3xl mt-20">
+              <p className="text-gray-400 text-sm mb-8 leading-relaxed">{error}</p>
+              <button
+                onClick={() => loadChapter(true)}
+                className="px-10 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-xs font-bold tracking-widest transition-all"
+              >
+                TENTAR NOVAMENTE
+              </button>
+            </div>
           ) : (
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-3xl mx-auto">
               <div 
-                className="leading-[1.8] whitespace-pre-wrap text-gray-200 font-serif"
+                className="leading-[1.9] whitespace-pre-wrap text-[#e2e8f0] font-serif"
                 style={{ fontSize: `${fontSize}px` }}
               >
                 {chapterText}
@@ -126,26 +172,27 @@ export function BibleReader({
           )}
         </div>
 
-        {/* FOOTER: Navegação */}
-        <div className="flex items-center justify-between p-4 md:p-6 border-t border-white/10 bg-[#162c38]">
+        <div className="flex items-center justify-between p-4 md:p-8 border-t border-white/5 bg-[#122835]">
           <button
-            onClick={() => setCurrentChapter(c => c - 1)}
-            disabled={currentChapter === 1}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-10 rounded-xl transition-all"
+            onClick={() => setCurrentChapter(c => Math.max(1, c - 1))}
+            disabled={currentChapter === 1 || loading}
+            className="flex items-center gap-2 px-6 py-3 bg-black/30 hover:bg-black/50 disabled:opacity-5 rounded-2xl transition-all text-xs font-bold tracking-widest text-gray-400"
           >
-            <ChevronLeft className="w-4 h-4" /> Anterior
+            <ChevronLeft size={18} /> ANTERIOR
           </button>
 
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-            Capítulo {currentChapter} de {totalChapters}
-          </p>
+          <div className="hidden sm:block">
+            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em]">
+              {currentChapter} / {totalChapters}
+            </p>
+          </div>
 
           <button
-            onClick={() => setCurrentChapter(c => c + 1)}
-            disabled={currentChapter === totalChapters}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 disabled:opacity-10 rounded-xl transition-all"
+            onClick={() => setCurrentChapter(c => Math.min(totalChapters, c + 1))}
+            disabled={currentChapter === totalChapters || loading}
+            className="flex items-center gap-2 px-6 py-3 bg-blue-500/10 text-[#2FA4FF] hover:bg-blue-500/20 disabled:opacity-5 rounded-2xl transition-all text-xs font-bold tracking-widest"
           >
-            Próximo <ChevronRight className="w-4 h-4" />
+            PROXIMO <ChevronRight size={18} />
           </button>
         </div>
       </div>

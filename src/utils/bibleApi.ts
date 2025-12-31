@@ -1,117 +1,97 @@
 // src/utils/bibleApi.ts
-
 type BibleBook = {
-  abbrev: string;
-  chapters: string[][];
+  name: string;          // ex: "Gálatas", "2 Coríntios"
+  abbrev: string;        // ex: "gl", "2co"
+  chapters: string[][];  // chapters[capituloIndex][versoIndex] = texto
 };
 
 let cachedBible: BibleBook[] | null = null;
 
-// Mapa FIXO pt-BR → abbrev do JSON
-const BOOK_ABBREV_MAP: Record<string, string> = {
-  "Gênesis": "gn",
-  "Êxodo": "ex",
-  "Levítico": "lv",
-  "Números": "nm",
-  "Deuteronômio": "dt",
-  "Josué": "js",
-  "Juízes": "jz",
-  "Rute": "rt",
-  "1 Samuel": "1sm",
-  "2 Samuel": "2sm",
-  "1 Reis": "1rs",
-  "2 Reis": "2rs",
-  "1 Crônicas": "1cr",
-  "2 Crônicas": "2cr",
-  "Esdras": "ed",
-  "Neemias": "ne",
-  "Ester": "et",
-  "Jó": "job",
-  "Salmos": "sl",
-  "Provérbios": "pv",
-  "Eclesiastes": "ec",
-  "Cânticos": "ct",
-  "Isaías": "is",
-  "Jeremias": "jr",
-  "Lamentações": "lm",
-  "Ezequiel": "ez",
-  "Daniel": "dn",
-  "Oséias": "os",
-  "Joel": "jl",
-  "Amós": "am",
-  "Obadias": "ob",
-  "Jonas": "jn",
-  "Miquéias": "mq",
-  "Naum": "na",
-  "Habacuque": "hc",
-  "Sofonias": "sf",
-  "Ageu": "ag",
-  "Zacarias": "zc",
-  "Malaquias": "ml",
-  "Mateus": "mt",
-  "Marcos": "mc",
-  "Lucas": "lc",
-  "João": "jo",
-  "Atos": "at",
-  "Romanos": "rm",
-  "1 Coríntios": "1co",
-  "2 Coríntios": "2co",
-  "Gálatas": "gl",
-  "Efésios": "ef",
-  "Filipenses": "fp",
-  "Colossenses": "cl",
-  "1 Tessalonicenses": "1ts",
-  "2 Tessalonicenses": "2ts",
-  "1 Timóteo": "1tm",
-  "2 Timóteo": "2tm",
-  "Tito": "tt",
-  "Filemom": "fm",
-  "Hebreus": "hb",
-  "Tiago": "tg",
-  "1 Pedro": "1pe",
-  "2 Pedro": "2pe",
-  "1 João": "1jo",
-  "2 João": "2jo",
-  "3 João": "3jo",
-  "Judas": "jd",
-  "Apocalipse": "ap"
-};
+/** Normaliza texto para comparar (remove acentos, baixa caixa, remove espaços extras) */
+function norm(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove acentos
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 async function loadBible(): Promise<BibleBook[]> {
   if (cachedBible) return cachedBible;
 
-  const res = await fetch("/nvi.json");
-  if (!res.ok) throw new Error("Não foi possível carregar nvi.json");
+  // Em Vite/Vercel, tudo que está em /public vira disponível na raiz:
+  // public/nvi.json -> https://seusite.com/nvi.json
+  const res = await fetch("/nvi.json", { cache: "no-store" });
 
-  cachedBible = await res.json();
-  return cachedBible;
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Falha ao carregar /nvi.json (${res.status}). ${text}`);
+  }
+
+  const data = (await res.json()) as BibleBook[];
+
+  if (!Array.isArray(data) || !data.length) {
+    throw new Error("Formato inválido em /nvi.json (não é um array de livros).");
+  }
+
+  cachedBible = data;
+  return data;
 }
 
+function findBook(bible: BibleBook[], bookPt: string): BibleBook | null {
+  const target = norm(bookPt);
+
+  // 1) tenta pelo name (mais comum no seu app)
+  let book = bible.find((b) => norm(b.name) === target);
+  if (book) return book;
+
+  // 2) tenta pelo abbrev (caso algum lugar use abreviação)
+  book = bible.find((b) => norm(b.abbrev) === target);
+  if (book) return book;
+
+  // 3) tenta “contém” (só pra tolerar pequenas diferenças)
+  book = bible.find((b) => norm(b.name).includes(target) || target.includes(norm(b.name)));
+  return book ?? null;
+}
+
+/**
+ * Mantém a assinatura compatível com o que você já tinha.
+ * translation é ignorado aqui porque estamos lendo do JSON local (NVI).
+ */
 export async function fetchBibleChapter(
   bookPt: string,
-  chapter: number
+  chapter: number,
+  _translation: string = "NVI"
 ): Promise<string> {
-  const abbrev = BOOK_ABBREV_MAP[bookPt];
-  if (!abbrev) {
-    throw new Error(`Livro não mapeado: ${bookPt}`);
-  }
-
-  const bible = await loadBible();
-  const book = bible.find(b => b.abbrev === abbrev);
-
-  if (!book) {
-    throw new Error(`Livro não encontrado no JSON: ${abbrev}`);
-  }
-
-  const chapterIndex = chapter - 1;
-  const verses = book.chapters[chapterIndex];
-
-  if (!verses) {
+  if (!Number.isFinite(chapter) || chapter <= 0) {
     throw new Error(`Capítulo inválido: ${chapter}`);
   }
 
-  // Numera versículos manualmente
-  return verses
-    .map((text, i) => `${i + 1}. ${text}`)
-    .join("\n");
+  const bible = await loadBible();
+  const book = findBook(bible, bookPt);
+
+  if (!book) {
+    throw new Error(`Livro não encontrado: ${bookPt}`);
+  }
+
+  const chapIndex = chapter - 1;
+  const chap = book.chapters?.[chapIndex];
+
+  if (!chap) {
+    const total = book.chapters?.length ?? 0;
+    throw new Error(`Capítulo ${chapter} não existe em ${book.name} (total: ${total}).`);
+  }
+
+  // chap é um array de versos (strings)
+  const lines = chap
+    .map((verseText, i) => {
+      const n = i + 1;
+      const t = String(verseText ?? "").trim();
+      if (!t) return null;
+      return `${n}. ${t}`;
+    })
+    .filter(Boolean) as string[];
+
+  return lines.join("\n");
 }

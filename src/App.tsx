@@ -228,9 +228,8 @@ export default function App() {
         <div className="space-y-20">
           <section>
             <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Antigo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {oldTestamentBooks.map((book) => (
-                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+              {oldTestamentBooks.map((book) => (<BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
             </div>
           </section>

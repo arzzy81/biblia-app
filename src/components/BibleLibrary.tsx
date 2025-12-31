@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Book as BibleIcon, ChevronRight } from 'lucide-react';
+import { X, Book as BibleIcon, Search, ChevronRight } from 'lucide-react';
 
 interface Book {
   name: string;
@@ -18,6 +18,7 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
+  // Lógica de busca funcional
   const filteredBooks = books.filter(book =>
     book.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -35,6 +36,7 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
         }}
       />
 
+      {/* Bible Panel */}
       <div className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-gradient-to-br from-[#0b1f2a] to-[#2a0f2f] border-l border-white/20 shadow-2xl z-50 flex flex-col">
         
         {/* Header */}
@@ -57,50 +59,36 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
           {!selectedBook ? (
-            <div className="space-y-8">
+            <div className="space-y-6">
               
-              {/* --- BUSCA ESTILO UIVERSE --- */}
-              <div className="flex justify-start">
-                <div className="relative h-[40px] text-white">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Pesquisar livro..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="
-                      peer
-                      pl-[40px] h-[40px] text-[15px] border-none text-white outline-none
-                      w-[40px] focus:w-[280px] md:focus:w-[350px] not-placeholder-shown:w-[280px] md:not-placeholder-shown:w-[350px]
-                      transition-all duration-300 ease-in-out
-                      bg-[#191A1E]/40 cursor-pointer focus:cursor-text
-                      rounded-[50px]
-                      shadow-[1.5px_1.5px_3px_#0e0e0e,-1.5px_-1.5px_3px_rgba(95,94,94,0.25)]
-                      focus:shadow-[inset_1.5px_1.5px_3px_#0e0e0e,inset_-1.5px_-1.5px_3px_#5f5e5e]
-                    "
-                  />
-                  <div className="absolute w-[40px] height-[40px] top-0 left-0 p-2.5 pointer-events-none peer-focus:pointer-events-auto peer-focus:cursor-pointer text-[#2FA4FF]">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 512 512">
-                      <title>Search</title>
-                      <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"></path>
-                      <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M338.29 338.29L448 448"></path>
-                    </svg>
-                  </div>
-                </div>
+              {/* BARRA DE PESQUISA SIMPLES E FUNCIONAL */}
+              <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2FA4FF] group-focus-within:text-white transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Pesquisar livro..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#2FA4FF]/50 focus:bg-white/10 transition-all"
+                />
               </div>
 
               {/* Lista de Livros */}
               <div className="grid grid-cols-1 gap-2">
-                {filteredBooks.map((book) => (
-                  <button
-                    key={book.name}
-                    onClick={() => setSelectedBook(book)}
-                    className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-[#2FA4FF]/30 transition-all group"
-                  >
-                    <span className="text-[#DADADA] group-hover:text-white font-medium">{book.name}</span>
-                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#2FA4FF] group-hover:translate-x-1 transition-all" />
-                  </button>
-                ))}
+                {filteredBooks.length > 0 ? (
+                  filteredBooks.map((book) => (
+                    <button
+                      key={book.name}
+                      onClick={() => setSelectedBook(book)}
+                      className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-[#2FA4FF]/30 transition-all group"
+                    >
+                      <span className="text-[#DADADA] group-hover:text-white font-medium">{book.name}</span>
+                      <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#2FA4FF] group-hover:translate-x-1 transition-all" />
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-center text-white/40 py-10 italic">Nenhum livro encontrado...</p>
+                )}
               </div>
             </div>
           ) : (
@@ -112,7 +100,7 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
                   <button
                     key={cap}
                     onClick={() => onSelectChapter(selectedBook.name, cap)}
-                    className="w-full aspect-square flex items-center justify-center bg-white/5 border border-white/10 rounded-lg text-xs font-bold text-[#DADADA] hover:bg-gradient-to-r hover:from-[#2FA4FF] hover:to-[#8B5CF6] hover:text-white hover:border-transparent hover:shadow-[0_0_15px_rgba(47,164,255,0.3)] transition-all active:scale-90"
+                    className="w-full aspect-square flex items-center justify-center bg-white/5 border border-white/10 rounded-lg text-xs font-bold text-[#DADADA] hover:bg-gradient-to-r hover:from-[#2FA4FF] hover:to-[#8B5CF6] hover:text-white hover:border-transparent transition-all active:scale-90"
                   >
                     {cap}
                   </button>
@@ -127,7 +115,7 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
            <div className="p-4 bg-[#2FA4FF]/5 rounded-xl border border-[#2FA4FF]/20">
               <p className="text-[11px] text-[#DADADA]/80 leading-relaxed flex gap-2">
                 <span className="text-[#2FA4FF]">💡</span>
-                <span>Escolha um livro para ver os capítulos. Ao selecionar, a leitura abrirá automaticamente.</span>
+                <span>Selecione um livro para ver os capítulos. Ao selecionar, a leitura abrirá automaticamente.</span>
               </p>
            </div>
         </div>

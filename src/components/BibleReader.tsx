@@ -1,17 +1,6 @@
 // src/components/BibleReader.tsx
 import { useState, useEffect } from 'react';
-import {
-  X,
-  ChevronLeft,
-  ChevronRight,
-  BookOpen,
-  Loader2,
-  CheckCircle2,
-  RefreshCw,
-  Copy,
-  Plus,
-  Minus,
-} from 'lucide-react';
+import { X, BookOpen, Loader2, CheckCircle2, Copy, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { fetchBibleChapter } from '../utils/bibleApi';
 
@@ -41,85 +30,65 @@ export function BibleReader({
   const [fontSize, setFontSize] = useState(18);
 
   useEffect(() => {
-    if (isOpen) {
-      setCurrentChapter(chapter);
-    }
+    if (isOpen) setCurrentChapter(chapter);
   }, [isOpen, chapter]);
 
   useEffect(() => {
     if (isOpen) {
-      loadChapter();
+      const load = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const text = await fetchBibleChapter(book, currentChapter);
+          setChapterText(text);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      load();
     }
   }, [isOpen, currentChapter, book]);
-
-  async function loadChapter() {
-    setLoading(true);
-    setError(null);
-    try {
-      const text = await fetchBibleChapter(book, currentChapter);
-      setChapterText(text);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao carregar');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleCopyText() {
-    await navigator.clipboard.writeText(chapterText);
-    toast.success('Texto copiado');
-  }
 
   if (!isOpen) return null;
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/80 z-[60]" onClick={onClose} />
-
-      <div className="fixed inset-0 md:inset-4 md:max-w-4xl md:mx-auto bg-[#0b1f2a] border border-white/20 rounded-2xl z-[70] flex flex-col shadow-2xl">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/95" onClick={onClose} />
+      
+      <div className="relative w-full h-full md:h-[90vh] md:max-w-4xl bg-[#0b1f2a] md:rounded-2xl flex flex-col overflow-hidden border border-white/10">
         <header className="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
-          <div className="flex gap-3 items-center">
-            <BookOpen className="text-blue-400" />
+          <div className="flex items-center gap-3">
+            <BookOpen className="text-blue-400" size={24} />
             <div>
-              <h2 className="font-bold text-white">{book} {currentChapter}</h2>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest">NVI - Local</p>
+              <h2 className="text-white font-bold">{book} {currentChapter}</h2>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest">NVI - Tradução Oficial</p>
             </div>
           </div>
-
-          <div className="flex gap-2 items-center">
-            <button className="p-1 hover:bg-white/10 rounded" onClick={() => setFontSize(f => Math.max(12, f - 2))}><Minus size={18} /></button>
-            <span className="text-xs w-8 text-center">{fontSize}px</span>
-            <button className="p-1 hover:bg-white/10 rounded" onClick={() => setFontSize(f => Math.min(30, f + 2))}><Plus size={18} /></button>
-            <div className="w-[1px] h-4 bg-white/10 mx-1" />
-            <button className="p-1 hover:bg-white/10 rounded text-blue-400" onClick={onMarkAsRead}>
-              <CheckCircle2 size={20} className={isRead ? "fill-blue-400 text-[#0b1f2a]" : ""} />
+          <div className="flex items-center gap-2">
+            <button className="p-2 hover:bg-white/10 rounded-full" onClick={() => setFontSize(s => Math.max(12, s-2))}><Minus size={18}/></button>
+            <button className="p-2 hover:bg-white/10 rounded-full" onClick={() => setFontSize(s => Math.min(30, s+2))}><Plus size={18}/></button>
+            <button className="p-2 hover:bg-white/10 rounded-full text-blue-400" onClick={onMarkAsRead}>
+              <CheckCircle2 className={isRead ? "fill-blue-400 text-black" : ""} size={22} />
             </button>
-            <button className="p-1 hover:bg-white/10 rounded" onClick={onClose}><X size={20} /></button>
+            <button className="p-2 hover:bg-white/10 rounded-full" onClick={onClose}><X size={24}/></button>
           </div>
         </header>
 
-        <main className="flex-1 p-6 overflow-y-auto custom-scrollbar bg-black/20">
-          {loading && (
-            <div className="flex flex-col items-center justify-center h-full gap-3">
-              <Loader2 className="animate-spin text-blue-400" size={40} />
-              <p className="text-gray-400">Carregando Escrituras...</p>
+        <main className="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-400">
+              <Loader2 className="animate-spin" size={40} />
+              <p>Carregando...</p>
             </div>
-          )}
-          
-          {error && (
-            <div className="flex flex-col items-center justify-center h-full text-center p-4">
-              <p className="text-red-400 mb-4">{error}</p>
-              <button onClick={loadChapter} className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                <RefreshCw size={16} /> Tentar novamente
-              </button>
+          ) : error ? (
+            <div className="text-red-400 text-center p-10 border border-red-500/20 rounded-xl bg-red-500/5">
+              <p className="font-bold mb-2">Ops! Algo deu errado:</p>
+              <p className="text-sm opacity-80">{error}</p>
             </div>
-          )}
-
-          {!loading && !error && (
-            <div 
-              style={{ fontSize: `${fontSize}px`, lineHeight: 1.7 }} 
-              className="text-gray-200 font-serif whitespace-pre-wrap pb-10"
-            >
+          ) : (
+            <div style={{ fontSize: `${fontSize}px` }} className="text-gray-200 leading-relaxed font-serif whitespace-pre-wrap max-w-2xl mx-auto pb-20">
               {chapterText}
             </div>
           )}
@@ -127,24 +96,22 @@ export function BibleReader({
 
         <footer className="p-4 border-t border-white/10 flex justify-between items-center bg-white/5">
           <button 
-            disabled={currentChapter === 1}
-            className="flex items-center gap-1 text-sm disabled:opacity-30"
-            onClick={() => setCurrentChapter(c => Math.max(1, c - 1))}
+            disabled={currentChapter <= 1}
+            onClick={() => setCurrentChapter(c => c - 1)}
+            className="flex items-center gap-2 text-sm text-gray-400 disabled:opacity-10"
           >
-            <ChevronLeft size={18} /> Anterior
+            <ChevronLeft size={20} /> Anterior
           </button>
-          
-          <span className="text-xs text-gray-400 uppercase">Capítulo {currentChapter} de {totalChapters}</span>
-          
+          <span className="text-xs text-gray-500">CAPÍTULO {currentChapter}</span>
           <button 
-            disabled={currentChapter === totalChapters}
-            className="flex items-center gap-1 text-sm disabled:opacity-30"
-            onClick={() => setCurrentChapter(c => Math.min(totalChapters, c + 1))}
+            disabled={currentChapter >= totalChapters}
+            onClick={() => setCurrentChapter(c => c + 1)}
+            className="flex items-center gap-2 text-sm text-gray-400 disabled:opacity-10"
           >
-            Próximo <ChevronRight size={18} />
+            Próximo <ChevronRight size={20} />
           </button>
         </footer>
       </div>
-    </>
+    </div>
   );
 }

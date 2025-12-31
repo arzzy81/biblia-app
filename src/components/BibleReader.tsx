@@ -59,16 +59,17 @@ export function BibleReader({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-0 md:p-4 lg:p-10">
-      {/* FUNDO ESCURO COM DESFOQUE - Bloqueia a visão do que está atrás */}
+      
+      {/* 1. CAMADA DE DESFOQUE DO FUNDO (Aqui você aumenta o blur se quiser) */}
       <div 
-        className="absolute inset-0 bg-black/98 backdrop-blur-md" 
+        className="absolute inset-0 bg-black/90 backdrop-blur-xl" 
         onClick={onClose} 
       />
 
-      {/* JANELA FLUTUANTE SÓLIDA */}
+      {/* 2. JANELA DE LEITURA (Fundo totalmente SÓLIDO para não vazar texto) */}
       <div className="relative w-full h-full max-w-5xl bg-[#0b161d] shadow-[0_0_60px_rgba(0,0,0,1)] md:rounded-2xl flex flex-col overflow-hidden border border-white/10">
         
-        {/* CABEÇALHO - Atualizado para NVI */}
+        {/* CABEÇALHO SÓLIDO - NVI */}
         <div className="flex items-center justify-between p-4 md:p-6 bg-[#122835] border-b border-white/5">
           <div className="flex items-center gap-4">
             <BookOpen className="w-6 h-6 text-[#2FA4FF]" />
@@ -97,7 +98,7 @@ export function BibleReader({
           </div>
         </div>
 
-        {/* ÁREA DE LEITURA */}
+        {/* ÁREA DO TEXTO - FUNDO 100% OPACO (Nada de transparência aqui) */}
         <div className="flex-1 overflow-y-auto p-6 md:p-12 bg-[#0b161d]">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full">
@@ -119,7 +120,7 @@ export function BibleReader({
           )}
         </div>
 
-        {/* RODAPÉ */}
+        {/* RODAPÉ SÓLIDO */}
         <div className="p-4 md:p-6 bg-[#122835] border-t border-white/5 flex justify-between items-center">
           <button 
             onClick={() => setCurrentChapter(c => Math.max(1, c-1))}

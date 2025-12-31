@@ -205,14 +205,10 @@ export default function App() {
           </p>
            </header>
         
-        <div className="text-center mb-12 md:mb-20">
-          <p className="text-[60px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">
-            Progresso de Leitura
-          </p>
-          <h2 className="text-[126px] md:text-[260px]  bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black" style={{ fontFamily: "'Crimson Text', serif" }}>
-          {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
+        <div className="text-center mb-12 md:mb-20 relative">
+          <h2 className="text-[36px] md:text-[72px] mb-3 md:mb-4 bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent leading-tight" style={{ fontFamily: "'Crimson Text', serif" }}>
+            {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
           </h2>
-        </div>
          
 
         <div className="mb-12 md:mb-20">

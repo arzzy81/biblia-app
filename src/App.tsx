@@ -4,15 +4,84 @@ import { DailyReadingCard } from './components/DailyReadingCard';
 import { SettingsPanel } from './components/SettingsPanel';
 import { BibleReader } from './components/BibleReader';
 import { BibleLibrary } from './components/BibleLibrary';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { getDayOfYear, getReadingForDay } from './utils/readingPlan';
 import { Settings, Book as BibleIcon } from 'lucide-react';
 
-// Lista de livros simplificada para o build (mantenha sua lista completa se tiver)
-const books = [
-  { name: "Gênesis", chapters: 50, testament: "old" },
-  { name: "Êxodo", chapters: 40, testament: "old" },
-  { name: "Apocalipse", chapters: 22, testament: "new" }
+interface Book {
+  name: string;
+  chapters: number;
+  testament?: string;
+  period?: string;
+}
+
+const books: Book[] = [
+  { name: "Gênesis", chapters: 50, testament: "old", period: "~4000-1800 a.C." },
+  { name: "Êxodo", chapters: 40, testament: "old", period: "~1446 a.C." },
+  { name: "Levítico", chapters: 27, testament: "old", period: "~1445 a.C." },
+  { name: "Números", chapters: 36, testament: "old", period: "~1445-1405 a.C." },
+  { name: "Deuteronômio", chapters: 34, testament: "old", period: "~1405 a.C." },
+  { name: "Josué", chapters: 24, testament: "old", period: "~1405-1385 a.C." },
+  { name: "Juízes", chapters: 21, testament: "old", period: "~1380-1050 a.C." },
+  { name: "Rute", chapters: 4, testament: "old", period: "~1100 a.C." },
+  { name: "1 Samuel", chapters: 31, testament: "old", period: "~1100-1010 a.C." },
+  { name: "2 Samuel", chapters: 24, testament: "old", period: "~1010-970 a.C." },
+  { name: "1 Reis", chapters: 22, testament: "old", period: "~970-850 a.C." },
+  { name: "2 Reis", chapters: 25, testament: "old", period: "~850-560 a.C." },
+  { name: "1 Crônicas", chapters: 29, testament: "old", period: "~1000-970 a.C." },
+  { name: "2 Crônicas", chapters: 36, testament: "old", period: "~970-538 a.C." },
+  { name: "Esdras", chapters: 10, testament: "old", period: "~538-457 a.C." },
+  { name: "Neemias", chapters: 13, testament: "old", period: "~445-420 a.C." },
+  { name: "Ester", chapters: 10, testament: "old", period: "~483-473 a.C." },
+  { name: "Jó", chapters: 42, testament: "old", period: "~2000-1800 a.C." },
+  { name: "Salmos", chapters: 150, testament: "old", period: "~1440-400 a.C." },
+  { name: "Provérbios", chapters: 31, testament: "old", period: "~950-700 a.C." },
+  { name: "Eclesiastes", chapters: 12, testament: "old", period: "~935 a.C." },
+  { name: "Cântico dos Cânticos", chapters: 8, testament: "old", period: "~965 a.C." },
+  { name: "Isaías", chapters: 66, testament: "old", period: "~740-680 a.C." },
+  { name: "Jeremias", chapters: 52, testament: "old", period: "~627-580 a.C." },
+  { name: "Lamentações", chapters: 5, testament: "old", period: "~586 a.C." },
+  { name: "Ezequiel", chapters: 48, testament: "old", period: "~593-571 a.C." },
+  { name: "Daniel", chapters: 12, testament: "old", period: "~605-530 a.C." },
+  { name: "Oséias", chapters: 14, testament: "old", period: "~755-715 a.C." },
+  { name: "Joel", chapters: 3, testament: "old", period: "~835 a.C." },
+  { name: "Amós", chapters: 9, testament: "old", period: "~760 a.C." },
+  { name: "Obadias", chapters: 1, testament: "old", period: "~840 a.C." },
+  { name: "Jonas", chapters: 4, testament: "old", period: "~760 a.C." },
+  { name: "Miquéias", chapters: 7, testament: "old", period: "~735-700 a.C." },
+  { name: "Naum", chapters: 3, testament: "old", period: "~663-612 a.C." },
+  { name: "Habacuque", chapters: 3, testament: "old", period: "~607 a.C." },
+  { name: "Sofonias", chapters: 3, testament: "old", period: "~630 a.C." },
+  { name: "Ageu", chapters: 2, testament: "old", period: "~520 a.C." },
+  { name: "Zacarias", chapters: 14, testament: "old", period: "~520-480 a.C." },
+  { name: "Malaquias", chapters: 4, testament: "old", period: "~430 a.C." },
+  { name: "Mateus", chapters: 28, testament: "new", period: "~4 a.C.-30 d.C." },
+  { name: "Marcos", chapters: 16, testament: "new", period: "~27-30 d.C." },
+  { name: "Lucas", chapters: 24, testament: "new", period: "~4 a.C.-30 d.C." },
+  { name: "João", chapters: 21, testament: "new", period: "~27-30 d.C." },
+  { name: "Atos", chapters: 28, testament: "new", period: "~30-62 d.C." },
+  { name: "Romanos", chapters: 16, testament: "new", period: "~57 d.C." },
+  { name: "1 Coríntios", chapters: 16, testament: "new", period: "~55 d.C." },
+  { name: "2 Coríntios", chapters: 13, testament: "new", period: "~56 d.C." },
+  { name: "Gálatas", chapters: 6, testament: "new", period: "~49 d.C." },
+  { name: "Efésios", chapters: 6, testament: "new", period: "~60 d.C." },
+  { name: "Filipenses", chapters: 4, testament: "new", period: "~61 d.C." },
+  { name: "Colossenses", chapters: 4, testament: "new", period: "~60 d.C." },
+  { name: "1 Tessalonicenses", chapters: 5, testament: "new", period: "~51 d.C." },
+  { name: "2 Tessalonicenses", chapters: 3, testament: "new", period: "~51 d.C." },
+  { name: "1 Timóteo", chapters: 6, testament: "new", period: "~63 d.C." },
+  { name: "2 Timóteo", chapters: 4, testament: "new", period: "~67 d.C." },
+  { name: "Tito", chapters: 3, testament: "new", period: "~63 d.C." },
+  { name: "Filemom", chapters: 1, testament: "new", period: "~60 d.C." },
+  { name: "Hebreus", chapters: 13, testament: "new", period: "~67 d.C." },
+  { name: "Tiago", chapters: 5, testament: "new", period: "~45 d.C." },
+  { name: "1 Pedro", chapters: 5, testament: "new", period: "~63 d.C." },
+  { name: "2 Pedro", chapters: 3, testament: "new", period: "~66 d.C." },
+  { name: "1 João", chapters: 5, testament: "new", period: "~90 d.C." },
+  { name: "2 João", chapters: 1, testament: "new", period: "~90 d.C." },
+  { name: "3 João", chapters: 1, testament: "new", period: "~90 d.C." },
+  { name: "Judas", chapters: 1, testament: "new", period: "~65 d.C." },
+  { name: "Apocalipse", chapters: 22, testament: "new", period: "~95 d.C." }
 ];
 
 export default function App() {
@@ -40,114 +109,146 @@ export default function App() {
     if (savedName) setUserName(savedName);
   }, []);
 
+  const saveProgress = (newReadChapters: Record<string, Set<number>>) => {
+    const toSave: Record<string, number[]> = {};
+    for (const [bookName, chapters] of Object.entries(newReadChapters)) {
+      toSave[bookName] = Array.from(chapters);
+    }
+    localStorage.setItem('bibleReadingProgress', JSON.stringify(toSave));
+  };
+
   const toggleChapter = (bookName: string, chapter: number) => {
     setReadChapters(prev => {
       const newState = { ...prev };
       if (!newState[bookName]) newState[bookName] = new Set();
       else newState[bookName] = new Set(newState[bookName]);
-      if (newState[bookName].has(chapter)) newState[bookName].delete(chapter);
+      const wasRead = newState[bookName].has(chapter);
+      if (wasRead) newState[bookName].delete(chapter);
       else newState[bookName].add(chapter);
-      
-      const toSave: Record<string, number[]> = {};
-      for (const [name, set] of Object.entries(newState)) {
-        toSave[name] = Array.from(set);
+      const book = books.find(b => b.name === bookName);
+      if (book && !wasRead && newState[bookName].size === book.chapters) {
+        toast.success('🎉 Parabéns!', { description: `Você completou o livro de ${bookName}!` });
       }
-      localStorage.setItem('bibleReadingProgress', JSON.stringify(toSave));
+      saveProgress(newState);
       return newState;
     });
   };
 
   const handleReadNow = (bookName: string, chapter: number) => {
     const bookInfo = books.find(b => b.name === bookName);
+    const actualTotal = bookInfo ? bookInfo.chapters : 1;
     setReaderBook(bookName);
     setReaderChapter(chapter);
-    setReaderTotalChapters(bookInfo ? bookInfo.chapters : 1);
+    setReaderTotalChapters(actualTotal);
     setIsReaderOpen(true);
     setIsLibraryOpen(false);
   };
 
-  const totalChaptersCount = 1189;
+  const oldTestamentBooks = books.filter(b => b.testament === "old");
+  const newTestamentBooks = books.filter(b => b.testament === "new");
+  const totalChaptersCount = books.reduce((sum, book) => sum + book.chapters, 0);
   const readChaptersCount = Object.values(readChapters).reduce((sum, set) => sum + set.size, 0);
-  const readingPercentage = Math.round((readChaptersCount / totalChaptersCount) * 100) || 0;
+  const readingPercentage = totalChaptersCount > 0 ? Math.round((readChaptersCount / totalChaptersCount) * 100) : 0;
+  const dailyReading = getReadingForDay(selectedDay);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-[#2FA4FF]/30">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white">
       <Toaster position="top-center" theme="dark" />
       
-      {/* Botões Superiores Flutuantes (Versão que funcionava) */}
-      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 p-1.5 bg-[#0b1f2a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
-        <button 
-          onClick={() => setIsLibraryOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-white/5 text-[#2FA4FF] transition-all active:scale-95"
-        >
-          <BibleIcon size={18} />
-          <span className="text-xs font-bold uppercase tracking-widest">Bíblia</span>
-        </button>
-        <div className="w-px h-4 bg-white/10" />
-        <button 
-          onClick={() => setIsSettingsOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-white/5 text-gray-400 transition-all active:scale-95"
-        >
-          <Settings size={18} />
-          <span className="text-xs font-bold uppercase tracking-widest">Ajustes</span>
-        </button>
+      {/* --- NAVBAR CENTRALIZADA E MODERNA --- */}
+      <div className="fixed top-0 left-0 right-0 z-[50] flex justify-center p-4 md:p-6">
+        <nav className="flex items-center gap-2 md:gap-4 p-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+          
+          {/* BOTÃO BÍBLIA */}
+          <button 
+            onClick={() => setIsLibraryOpen(true)}
+            className="flex items-center gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl bg-[#2FA4FF]/10 hover:bg-[#2FA4FF]/20 text-[#2FA4FF] border border-[#2FA4FF]/20 transition-all active:scale-95 group"
+          >
+            <BibleIcon size={20} className="group-hover:rotate-12 transition-transform" />
+            <span className="text-[11px] md:text-sm font-bold uppercase tracking-widest">Bíblia</span>
+          </button>
+          
+          <div className="w-[1px] h-6 bg-white/10 mx-1 hidden md:block" />
+
+          {/* BOTÃO AJUSTES */}
+          <button 
+            onClick={() => setIsSettingsOpen(true)}
+            className="flex items-center gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-all active:scale-95 group"
+          >
+            <Settings size={20} className="group-hover:rotate-90 transition-transform duration-500" />
+            <span className="text-[11px] md:text-sm font-bold uppercase tracking-widest">Ajustes</span>
+          </button>
+
+        </nav>
       </div>
 
-      {/* Conteúdo Principal com margem superior para não bater nos botões */}
-      <main className={`max-w-4xl mx-auto px-6 pt-32 pb-20 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-xl opacity-20' : 'opacity-100'}`}>
+      <div className={`px-4 md:px-12 lg:px-20 pt-32 pb-16 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
-        <header className="mb-16">
-          <h1 className="text-3xl md:text-5xl font-light leading-tight">
-            Um dia por vez. <br />
-            Um texto por dia. <br />
-            <span className="font-bold text-[#2FA4FF]">Uma vida transformada.</span>
+        <header className="mb-12 md:mb-16 max-w-2xl">
+          <h1 className="text-[28px] md:text-[46px] leading-[1.2] mb-4 md:mb-6" style={{ fontFamily: "'Crimson Text', serif" }}>
+            Um dia por vez.<br /> Um texto por dia.<br /> Uma vida transformada.
           </h1>
+          <p className="text-[14px] md:text-[18px] text-[#DADADA]">
+            Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
+          </p>
         </header>
 
-        <div className="text-center mb-20">
-          <h2 className="text-7xl md:text-9xl font-black text-white/5 leading-none select-none">
-            {readingPercentage}%
+        <div className="text-center mb-12 md:mb-20">
+          <h2 className="text-[36px] md:text-[72px] mb-3 md:mb-4 bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent" style={{ fontFamily: "'Crimson Text', serif" }}>
+            {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
           </h2>
-          <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] uppercase font-bold -mt-4">
-            Seu progresso total
-          </p>
         </div>
 
-        <DailyReadingCard
-          currentDay={selectedDay}
-          dailyReading={getReadingForDay(selectedDay)}
-          onDayChange={setSelectedDay}
-          readChapters={readChapters}
-          onToggleChapter={toggleChapter}
-          onReadNow={handleReadNow}
-        />
+        <div className="mb-12 md:mb-20">
+          <DailyReadingCard
+            currentDay={selectedDay}
+            dailyReading={dailyReading}
+            onDayChange={setSelectedDay}
+            readChapters={readChapters}
+            onToggleChapter={toggleChapter}
+            onReadNow={handleReadNow}
+          />
+        </div>
 
-        <div className="grid gap-12 mt-20">
+        <div className="space-y-20">
           <section>
-            <h3 className="text-[10px] tracking-[0.4em] text-gray-500 uppercase font-bold mb-6 border-b border-white/5 pb-2">Antigo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {books.filter(b => b.testament === "old").map(book => (
-                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(c) => toggleChapter(book.name, c)} onReadNow={handleReadNow} />
+            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Antigo Testamento</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {oldTestamentBooks.map((book) => (
+                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Novo Testamento</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newTestamentBooks.map((book) => (
+                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
             </div>
           </section>
         </div>
-      </main>
+      </div>
 
-      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userName={userName} onUserNameChange={setUserName} />
-      <BibleLibrary isOpen={isLibraryOpen} onClose={() => setIsLibraryOpen(false)} books={books} onSelectChapter={handleReadNow} />
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userName={userName} onUserNameChange={(n) => { setUserName(n); localStorage.setItem('bibleUserName', n); }} />
       
-      {isReaderOpen && (
-        <BibleReader 
-          isOpen={isReaderOpen} 
-          onClose={() => setIsReaderOpen(false)} 
-          book={readerBook} 
-          chapter={readerChapter} 
-          totalChapters={readerTotalChapters} 
-          isRead={readChapters[readerBook]?.has(readerChapter) || false} 
-          onMarkAsRead={() => toggleChapter(readerBook, readerChapter)} 
-        />
-      )}
+      <BibleLibrary 
+        isOpen={isLibraryOpen} 
+        onClose={() => setIsLibraryOpen(false)} 
+        books={books as any} 
+        onSelectChapter={handleReadNow} 
+      />
+
+      <BibleReader
+        isOpen={isReaderOpen}
+        onClose={() => setIsReaderOpen(false)}
+        book={readerBook}
+        chapter={readerChapter}
+        totalChapters={readerTotalChapters}
+        isRead={readChapters[readerBook]?.has(readerChapter) || false}
+        onMarkAsRead={() => toggleChapter(readerBook, readerChapter)}
+      />
     </div>
   );
 }

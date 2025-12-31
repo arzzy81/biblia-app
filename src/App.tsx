@@ -152,30 +152,33 @@ export default function App() {
   const dailyReading = getReadingForDay(selectedDay);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#020617] text-white flex flex-col font-sans overflow-x-hidden">
       <Toaster position="top-center" theme="dark" />
       
-      {/* CONTEÚDO COM MUITO ESPAÇO NO TOPO (pt-48) */}
-      <div className={`px-6 md:px-12 lg:px-20 pt-48 pb-44 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+      {/* CONTEÚDO PRINCIPAL COM RESPIRO NO TOPO */}
+      <main className={`flex-1 px-4 md:px-12 lg:px-20 pt-32 pb-40 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
-        <header className="mb-24 max-w-2xl">
-          <h1 className="text-[32px] md:text-[52px] leading-[1.1] mb-8 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
+        {/* CABEÇALHO COM FRASE */}
+        <header className="mb-20 max-w-3xl">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl leading-tight mb-8 font-serif italic">
             Um dia por vez.<br /> 
             Um texto por dia.<br /> 
             <span className="font-bold text-[#2FA4FF] not-italic">Uma vida transformada.</span>
           </h1>
-          <p className="text-[16px] md:text-[20px] text-slate-400 leading-relaxed max-w-lg border-l-2 border-[#2FA4FF]/30 pl-6 italic">
+          <p className="text-base md:text-xl text-slate-400 border-l-2 border-[#2FA4FF]/40 pl-6 italic max-w-xl">
             "Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado..."
           </p>
         </header>
 
+        {/* INDICADOR DE PROGRESSO */}
         <div className="text-center mb-24">
-           <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">Progresso de Leitura</p>
-          <h2 className="text-[40px] md:text-[80px] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black">
+          <p className="text-[10px] tracking-[0.4em] text-[#2FA4FF] font-bold uppercase mb-2">Seu progresso total</p>
+          <div className="text-6xl md:text-8xl font-black bg-gradient-to-b from-white to-white/20 bg-clip-text text-transparent">
             {readingPercentage}%
-          </h2>
+          </div>
         </div>
 
+        {/* CARD DE LEITURA DIÁRIA */}
         <div className="mb-24">
           <DailyReadingCard
             currentDay={selectedDay}
@@ -187,10 +190,11 @@ export default function App() {
           />
         </div>
 
-        <div className="space-y-20">
+        {/* LISTA DE LIVROS */}
+        <div className="space-y-32">
           <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic font-bold">Antigo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h3 className="text-center text-[10px] tracking-[0.5em] uppercase text-slate-500 mb-12 font-bold italic">Antigo Testamento</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {oldTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
@@ -198,54 +202,73 @@ export default function App() {
           </section>
 
           <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic font-bold">Novo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h3 className="text-center text-[10px] tracking-[0.5em] uppercase text-slate-500 mb-12 font-bold italic">Novo Testamento</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {newTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
             </div>
           </section>
         </div>
-      </div>
+      </main>
 
-      {/* --- RODAPÉ ESTILO BARRA DE NAVEGAÇÃO FIXA --- */}
-      <footer className="fixed bottom-0 left-0 right-0 z-[60] bg-[#0b1f2a]/95 backdrop-blur-2xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.6)]">
-        <nav className="max-w-xl mx-auto flex items-center justify-around h-20 px-6">
+      {/* --- RODAPÉ FIXO (TAB BAR) --- */}
+      <footer className="fixed bottom-0 left-0 right-0 z-[100] bg-[#0b1f2a]/95 backdrop-blur-xl border-t border-white/10">
+        <nav className="max-w-md mx-auto h-20 flex items-center">
           
           <button 
             onClick={() => setIsLibraryOpen(true)}
-            className="flex flex-col items-center justify-center gap-1 w-1/2 h-full transition-all active:scale-90"
+            className="flex-1 flex flex-col items-center justify-center gap-1 transition-all active:scale-90"
           >
             <BibleIcon size={24} className="text-[#2FA4FF]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2FA4FF]">Biblioteca</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#2FA4FF]">Biblioteca</span>
           </button>
           
           <div className="w-px h-8 bg-white/10" />
 
           <button 
             onClick={() => setIsSettingsOpen(true)}
-            className="flex flex-col items-center justify-center gap-1 w-1/2 h-full transition-all active:scale-90"
+            className="flex-1 flex flex-col items-center justify-center gap-1 transition-all active:scale-90"
           >
             <Settings size={24} className="text-slate-400" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Ajustes</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ajustes</span>
           </button>
 
         </nav>
-        {/* Espaço extra para mobile (Gesture bar) */}
-        <div className="h-4"></div>
+        {/* Espaçador para barra de gestos do iPhone */}
+        <div className="h-safe-bottom h-2"></div>
       </footer>
 
-      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userName={userName} onUserNameChange={(n) => { setUserName(n); localStorage.setItem('bibleUserName', n); }} />
-      <BibleLibrary isOpen={isLibraryOpen} onClose={() => setIsLibraryOpen(false)} books={books as any} onSelectChapter={handleReadNow} />
-      <BibleReader
-        isOpen={isReaderOpen}
-        onClose={() => setIsReaderOpen(false)}
-        book={readerBook}
-        chapter={readerChapter}
-        totalChapters={readerTotalChapters}
-        isRead={readChapters[readerBook]?.has(readerChapter) || false}
-        onMarkAsRead={() => toggleChapter(readerBook, readerChapter)}
-      />
+      {/* MODAIS */}
+      {isSettingsOpen && (
+        <SettingsPanel 
+          isOpen={isSettingsOpen} 
+          onClose={() => setIsSettingsOpen(false)} 
+          userName={userName} 
+          onUserNameChange={(n) => { setUserName(n); localStorage.setItem('bibleUserName', n); }} 
+        />
+      )}
+      
+      {isLibraryOpen && (
+        <BibleLibrary 
+          isOpen={isLibraryOpen} 
+          onClose={() => setIsLibraryOpen(false)} 
+          books={books as any} 
+          onSelectChapter={handleReadNow} 
+        />
+      )}
+
+      {isReaderOpen && (
+        <BibleReader
+          isOpen={isReaderOpen}
+          onClose={() => setIsReaderOpen(false)}
+          book={readerBook}
+          chapter={readerChapter}
+          totalChapters={readerTotalChapters}
+          isRead={readChapters[readerBook]?.has(readerChapter) || false}
+          onMarkAsRead={() => toggleChapter(readerBook, readerChapter)}
+        />
+      )}
     </div>
   );
 }

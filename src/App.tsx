@@ -8,7 +8,6 @@ import { Toaster, toast } from 'sonner';
 import { getDayOfYear, getReadingForDay } from './utils/readingPlan';
 import { Settings, Book as BibleIcon } from 'lucide-react';
 
-// ... (Interface e Array de books permanecem idênticos ao seu código)
 interface Book {
   name: string;
   chapters: number;
@@ -18,7 +17,70 @@ interface Book {
 
 const books: Book[] = [
   { name: "Gênesis", chapters: 50, testament: "old", period: "~4000-1800 a.C." },
-  // ... (restante dos livros)
+  { name: "Êxodo", chapters: 40, testament: "old", period: "~1446 a.C." },
+  { name: "Levítico", chapters: 27, testament: "old", period: "~1445 a.C." },
+  { name: "Números", chapters: 36, testament: "old", period: "~1445-1405 a.C." },
+  { name: "Deuteronômio", chapters: 34, testament: "old", period: "~1405 a.C." },
+  { name: "Josué", chapters: 24, testament: "old", period: "~1405-1385 a.C." },
+  { name: "Juízes", chapters: 21, testament: "old", period: "~1380-1050 a.C." },
+  { name: "Rute", chapters: 4, testament: "old", period: "~1100 a.C." },
+  { name: "1 Samuel", chapters: 31, testament: "old", period: "~1100-1010 a.C." },
+  { name: "2 Samuel", chapters: 24, testament: "old", period: "~1010-970 a.C." },
+  { name: "1 Reis", chapters: 22, testament: "old", period: "~970-850 a.C." },
+  { name: "2 Reis", chapters: 25, testament: "old", period: "~850-560 a.C." },
+  { name: "1 Crônicas", chapters: 29, testament: "old", period: "~1000-970 a.C." },
+  { name: "2 Crônicas", chapters: 36, testament: "old", period: "~970-538 a.C." },
+  { name: "Esdras", chapters: 10, testament: "old", period: "~538-457 a.C." },
+  { name: "Neemias", chapters: 13, testament: "old", period: "~445-420 a.C." },
+  { name: "Ester", chapters: 10, testament: "old", period: "~483-473 a.C." },
+  { name: "Jó", chapters: 42, testament: "old", period: "~2000-1800 a.C." },
+  { name: "Salmos", chapters: 150, testament: "old", period: "~1440-400 a.C." },
+  { name: "Provérbios", chapters: 31, testament: "old", period: "~950-700 a.C." },
+  { name: "Eclesiastes", chapters: 12, testament: "old", period: "~935 a.C." },
+  { name: "Cântico dos Cânticos", chapters: 8, testament: "old", period: "~965 a.C." },
+  { name: "Isaías", chapters: 66, testament: "old", period: "~740-680 a.C." },
+  { name: "Jeremias", chapters: 52, testament: "old", period: "~627-580 a.C." },
+  { name: "Lamentações", chapters: 5, testament: "old", period: "~586 a.C." },
+  { name: "Ezequiel", chapters: 48, testament: "old", period: "~593-571 a.C." },
+  { name: "Daniel", chapters: 12, testament: "old", period: "~605-530 a.C." },
+  { name: "Oséias", chapters: 14, testament: "old", period: "~755-715 a.C." },
+  { name: "Joel", chapters: 3, testament: "old", period: "~835 a.C." },
+  { name: "Amós", chapters: 9, testament: "old", period: "~760 a.C." },
+  { name: "Obadias", chapters: 1, testament: "old", period: "~840 a.C." },
+  { name: "Jonas", chapters: 4, testament: "old", period: "~760 a.C." },
+  { name: "Miquéias", chapters: 7, testament: "old", period: "~735-700 a.C." },
+  { name: "Naum", chapters: 3, testament: "old", period: "~663-612 a.C." },
+  { name: "Habacuque", chapters: 3, testament: "old", period: "~607 a.C." },
+  { name: "Sofonias", chapters: 3, testament: "old", period: "~630 a.C." },
+  { name: "Ageu", chapters: 2, testament: "old", period: "~520 a.C." },
+  { name: "Zacarias", chapters: 14, testament: "old", period: "~520-480 a.C." },
+  { name: "Malaquias", chapters: 4, testament: "old", period: "~430 a.C." },
+  { name: "Mateus", chapters: 28, testament: "new", period: "~4 a.C.-30 d.C." },
+  { name: "Marcos", chapters: 16, testament: "new", period: "~27-30 d.C." },
+  { name: "Lucas", chapters: 24, testament: "new", period: "~4 a.C.-30 d.C." },
+  { name: "João", chapters: 21, testament: "new", period: "~27-30 d.C." },
+  { name: "Atos", chapters: 28, testament: "new", period: "~30-62 d.C." },
+  { name: "Romanos", chapters: 16, testament: "new", period: "~57 d.C." },
+  { name: "1 Coríntios", chapters: 16, testament: "new", period: "~55 d.C." },
+  { name: "2 Coríntios", chapters: 13, testament: "new", period: "~56 d.C." },
+  { name: "Gálatas", chapters: 6, testament: "new", period: "~49 d.C." },
+  { name: "Efésios", chapters: 6, testament: "new", period: "~60 d.C." },
+  { name: "Filipenses", chapters: 4, testament: "new", period: "~61 d.C." },
+  { name: "Colossenses", chapters: 4, testament: "new", period: "~60 d.C." },
+  { name: "1 Tessalonicenses", chapters: 5, testament: "new", period: "~51 d.C." },
+  { name: "2 Tessalonicenses", chapters: 3, testament: "new", period: "~51 d.C." },
+  { name: "1 Timóteo", chapters: 6, testament: "new", period: "~63 d.C." },
+  { name: "2 Timóteo", chapters: 4, testament: "new", period: "~67 d.C." },
+  { name: "Tito", chapters: 3, testament: "new", period: "~63 d.C." },
+  { name: "Filemom", chapters: 1, testament: "new", period: "~60 d.C." },
+  { name: "Hebreus", chapters: 13, testament: "new", period: "~67 d.C." },
+  { name: "Tiago", chapters: 5, testament: "new", period: "~45 d.C." },
+  { name: "1 Pedro", chapters: 5, testament: "new", period: "~63 d.C." },
+  { name: "2 Pedro", chapters: 3, testament: "new", period: "~66 d.C." },
+  { name: "1 João", chapters: 5, testament: "new", period: "~90 d.C." },
+  { name: "2 João", chapters: 1, testament: "new", period: "~90 d.C." },
+  { name: "3 João", chapters: 1, testament: "new", period: "~90 d.C." },
+  { name: "Judas", chapters: 1, testament: "new", period: "~65 d.C." },
   { name: "Apocalipse", chapters: 22, testament: "new", period: "~95 d.C." }
 ];
 
@@ -90,28 +152,31 @@ export default function App() {
   const dailyReading = getReadingForDay(selectedDay);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#020617] text-white flex flex-col font-sans">
       <Toaster position="top-center" theme="dark" />
       
-      {/* CONTEÚDO COM MARGEM INFERIOR AUMENTADA (pb-40) PARA NÃO COBRIR O TEXTO */}
-      <div className={`px-4 md:px-12 lg:px-20 pt-12 pb-40 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+      {/* CONTEÚDO COM MUITO ESPAÇO NO TOPO (pt-48) */}
+      <div className={`px-6 md:px-12 lg:px-20 pt-48 pb-44 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
-        <header className="mb-12 md:mb-16 max-w-2xl">
-          <h1 className="text-[28px] md:text-[46px] leading-[1.2] mb-4 md:mb-6" style={{ fontFamily: "'Crimson Text', serif" }}>
-            Um dia por vez.<br /> Um texto por dia.<br /> Uma vida transformada.
+        <header className="mb-24 max-w-2xl">
+          <h1 className="text-[32px] md:text-[52px] leading-[1.1] mb-8 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
+            Um dia por vez.<br /> 
+            Um texto por dia.<br /> 
+            <span className="font-bold text-[#2FA4FF] not-italic">Uma vida transformada.</span>
           </h1>
-          <p className="text-[14px] md:text-[18px] text-[#DADADA]">
-            Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
+          <p className="text-[16px] md:text-[20px] text-slate-400 leading-relaxed max-w-lg border-l-2 border-[#2FA4FF]/30 pl-6 italic">
+            "Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado..."
           </p>
         </header>
 
-        <div className="text-center mb-12 md:mb-20">
-          <h2 className="text-[36px] md:text-[72px] mb-3 md:mb-4 bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent" style={{ fontFamily: "'Crimson Text', serif" }}>
-            {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
+        <div className="text-center mb-24">
+           <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">Progresso de Leitura</p>
+          <h2 className="text-[40px] md:text-[80px] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black">
+            {readingPercentage}%
           </h2>
         </div>
 
-        <div className="mb-12 md:mb-20">
+        <div className="mb-24">
           <DailyReadingCard
             currentDay={selectedDay}
             dailyReading={dailyReading}
@@ -124,7 +189,7 @@ export default function App() {
 
         <div className="space-y-20">
           <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Antigo Testamento</h3>
+            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic font-bold">Antigo Testamento</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {oldTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
@@ -133,7 +198,7 @@ export default function App() {
           </section>
 
           <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Novo Testamento</h3>
+            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic font-bold">Novo Testamento</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {newTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
@@ -143,44 +208,35 @@ export default function App() {
         </div>
       </div>
 
-      {/* --- NOVA TAB BAR DE NAVEGAÇÃO (ESTILO MOBILE APP) --- */}
-      <footer className="fixed bottom-0 left-0 right-0 z-[50] px-4 pb-6 pt-2 bg-gradient-to-t from-black via-black/95 to-transparent">
-        <nav className="max-w-md mx-auto flex items-stretch bg-[#0b1f2a]/95 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+      {/* --- RODAPÉ ESTILO BARRA DE NAVEGAÇÃO FIXA --- */}
+      <footer className="fixed bottom-0 left-0 right-0 z-[60] bg-[#0b1f2a]/95 backdrop-blur-2xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.6)]">
+        <nav className="max-w-xl mx-auto flex items-center justify-around h-20 px-6">
           
-          {/* Aba Biblioteca */}
           <button 
             onClick={() => setIsLibraryOpen(true)}
-            className="flex-1 flex flex-col items-center justify-center gap-1 py-4 hover:bg-white/5 transition-all active:bg-white/10"
+            className="flex flex-col items-center justify-center gap-1 w-1/2 h-full transition-all active:scale-90"
           >
-            <BibleIcon size={22} className="text-[#2FA4FF]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#2FA4FF]">Biblioteca</span>
+            <BibleIcon size={24} className="text-[#2FA4FF]" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2FA4FF]">Biblioteca</span>
           </button>
           
-          {/* Divisor Visual Silencioso */}
-          <div className="w-[1px] bg-white/5 my-4" />
+          <div className="w-px h-8 bg-white/10" />
 
-          {/* Aba Ajustes */}
           <button 
             onClick={() => setIsSettingsOpen(true)}
-            className="flex-1 flex flex-col items-center justify-center gap-1 py-4 hover:bg-white/5 transition-all active:bg-white/10"
+            className="flex flex-col items-center justify-center gap-1 w-1/2 h-full transition-all active:scale-90"
           >
-            <Settings size={22} className="text-gray-400" />
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">Ajustes</span>
+            <Settings size={24} className="text-slate-400" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Ajustes</span>
           </button>
 
         </nav>
+        {/* Espaço extra para mobile (Gesture bar) */}
+        <div className="h-4"></div>
       </footer>
 
-      {/* --- MODAIS E COMPONENTES DE LEITURA --- */}
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userName={userName} onUserNameChange={(n) => { setUserName(n); localStorage.setItem('bibleUserName', n); }} />
-      
-      <BibleLibrary 
-        isOpen={isLibraryOpen} 
-        onClose={() => setIsLibraryOpen(false)} 
-        books={books as any} 
-        onSelectChapter={handleReadNow} 
-      />
-
+      <BibleLibrary isOpen={isLibraryOpen} onClose={() => setIsLibraryOpen(false)} books={books as any} onSelectChapter={handleReadNow} />
       <BibleReader
         isOpen={isReaderOpen}
         onClose={() => setIsReaderOpen(false)}

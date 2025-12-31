@@ -224,15 +224,18 @@ export default function App() {
             onReadNow={handleReadNow}
           />
         </div>
- <div className="space-y-20">
-          <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Antigo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap12">
-              {oldTestamentBooks.map((book) => (<BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
-              ))}
-            </div>
-            <br />
-          </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+            {oldTestamentBooks.map((book) => (
+              <BookCard
+                key={book.name}
+                book={book}
+                readChapters={readChapters[book.name] || new Set()}
+                onToggleChapter={(chapter) => toggleChapter(book.name, chapter)}
+                onReadNow={handleReadNow}
+              />
+            ))}
+          </div>
+        </div>
 
           <section>
             <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Novo Testamento</h3>

@@ -1,38 +1,32 @@
 // src/utils/bibleApi.ts
+
 type BibleBook = {
-  name: string;          // ex: "Gálatas", "2 Coríntios"
-  abbrev: string;        // ex: "gl", "2co"
-  chapters: string[][];  // chapters[capituloIndex][versoIndex] = texto
+  name?: string;
+  abbrev: string;
+  chapters: string[][]; // [ [verso1, verso2...], [cap2...], ... ]
 };
 
 let cachedBible: BibleBook[] | null = null;
 
-/** Normaliza texto para comparar (remove acentos, baixa caixa, remove espaços extras) */
-function norm(s: string) {
-  return s
+function normalize(str: string) {
+  return str
+    .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // remove acentos
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/[^a-z0-9]/g, ""); // remove espaços/pontuação
 }
 
 async function loadBible(): Promise<BibleBook[]> {
   if (cachedBible) return cachedBible;
 
-  // Em Vite/Vercel, tudo que está em /public vira disponível na raiz:
-  // public/nvi.json -> https://seusite.com/nvi.json
   const res = await fetch("/nvi.json", { cache: "no-store" });
-
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Falha ao carregar /nvi.json (${res.status}). ${text}`);
+    throw new Error(`Não foi possível carregar /nvi.json (${res.status})`);
   }
 
   const data = (await res.json()) as BibleBook[];
-
   if (!Array.isArray(data) || !data.length) {
-    throw new Error("Formato inválido em /nvi.json (não é um array de livros).");
+    throw new Error("nvi.json inválido ou vazio.");
   }
 
   cachedBible = data;
@@ -40,58 +34,49 @@ async function loadBible(): Promise<BibleBook[]> {
 }
 
 function findBook(bible: BibleBook[], bookPt: string): BibleBook | null {
-  const target = norm(bookPt);
+  // 1) tenta por nome exato (com acento)
+  const exact = bible.find((b) => b.name === bookPt);
+  if (exact) return exact;
 
-  // 1) tenta pelo name (mais comum no seu app)
-  let book = bible.find((b) => norm(b.name) === target);
-  if (book) return book;
+  const target = normalize(bookPt);
 
-  // 2) tenta pelo abbrev (caso algum lugar use abreviação)
-  book = bible.find((b) => norm(b.abbrev) === target);
-  if (book) return book;
+  // 2) tenta por nome normalizado (sem acento)
+  const byName = bible.find((b) => b.name && normalize(b.name) === target);
+  if (byName) return byName;
 
-  // 3) tenta “contém” (só pra tolerar pequenas diferenças)
-  book = bible.find((b) => norm(b.name).includes(target) || target.includes(norm(b.name)));
-  return book ?? null;
+  // 3) tenta se o usuário já passou abreviação (ex: "gl", "2co", "gn")
+  const byAbbrev = bible.find((b) => normalize(b.abbrev) === target);
+  if (byAbbrev) return byAbbrev;
+
+  return null;
 }
 
 /**
- * Mantém a assinatura compatível com o que você já tinha.
- * translation é ignorado aqui porque estamos lendo do JSON local (NVI).
+ * Lê um capítulo do JSON local.
+ * - bookPt: nome em PT-BR (ex: "Gálatas", "2 Coríntios") OU abreviação (ex: "gl", "2co")
+ * - chapter: número do capítulo (1-based)
+ * - translation: ignorado (mantido só pra compatibilidade com seu componente)
  */
 export async function fetchBibleChapter(
   bookPt: string,
   chapter: number,
-  _translation: string = "NVI"
+  translation: string = "NVI"
 ): Promise<string> {
+  const bible = await loadBible();
+
+  const book = findBook(bible, bookPt);
+  if (!book) throw new Error(`Livro não encontrado: ${bookPt}`);
+
   if (!Number.isFinite(chapter) || chapter <= 0) {
     throw new Error(`Capítulo inválido: ${chapter}`);
   }
 
-  const bible = await loadBible();
-  const book = findBook(bible, bookPt);
-
-  if (!book) {
-    throw new Error(`Livro não encontrado: ${bookPt}`);
+  const capIndex = chapter - 1;
+  const cap = book.chapters?.[capIndex];
+  if (!cap) {
+    throw new Error(`Capítulo não encontrado: ${book.name ?? book.abbrev} ${chapter}`);
   }
 
-  const chapIndex = chapter - 1;
-  const chap = book.chapters?.[chapIndex];
-
-  if (!chap) {
-    const total = book.chapters?.length ?? 0;
-    throw new Error(`Capítulo ${chapter} não existe em ${book.name} (total: ${total}).`);
-  }
-
-  // chap é um array de versos (strings)
-  const lines = chap
-    .map((verseText, i) => {
-      const n = i + 1;
-      const t = String(verseText ?? "").trim();
-      if (!t) return null;
-      return `${n}. ${t}`;
-    })
-    .filter(Boolean) as string[];
-
-  return lines.join("\n");
+  // Monta: "1. texto\n2. texto\n..."
+  return cap.map((v, i) => `${i + 1}. ${v}`).join("\n");
 }

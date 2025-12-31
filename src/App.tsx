@@ -203,17 +203,18 @@ export default function App() {
           <p className="text-[14px] md:text-[18px] text-[#DADADA] border-l-2 border-[#2FA4FF]/30 pl-6">
             Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
           </p>
+           </header>
+
         
         <div className="text-center mb-12 md:mb-20">
           <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">
             Progresso de Leitura
           </p>
-       <h2 className="text-[60px] md:text-[100px] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black" style={{ fontFamily: "'Crimson Text', serif" }}>
+       <h2 className="text-[60px] md:text-[100px] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] leading-[0.9] bg-clip-text text-transparent font-black" style={{ fontFamily: "'Crimson Text', serif" }}>
             {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
        </h2>
         </div>
-          </header>
-
+         
 
         <div className="mb-12 md:mb-20">
           <DailyReadingCard

@@ -61,7 +61,7 @@ export function BibleReader({
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-0 md:p-4 lg:p-10">
       {/* FUNDO ESCURO COM DESFOQUE - Bloqueia a visão do que está atrás */}
       <div 
-        className="absolute inset-0 bg-black/98 backdrop-blur-x1" 
+        className="absolute inset-0 bg-black/98 backdrop-blur-md" 
         onClick={onClose} 
       />
 

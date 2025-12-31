@@ -152,37 +152,10 @@ export default function App() {
   const dailyReading = getReadingForDay(selectedDay);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white flex flex-col">
       <Toaster position="top-center" theme="dark" />
       
-      {/* --- NAVBAR CENTRALIZADA E MODERNA --- */}
-      <div className="fixed top-0 left-0 right-0 z-[50] flex justify-center p-4 md:p-6">
-        <nav className="flex items-center gap-2 md:gap-4 p-2 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
-          
-          {/* BOTÃO BÍBLIA */}
-          <button 
-            onClick={() => setIsLibraryOpen(true)}
-            className="flex items-center gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl bg-[#2FA4FF]/10 hover:bg-[#2FA4FF]/20 text-[#2FA4FF] border border-[#2FA4FF]/20 transition-all active:scale-95 group"
-          >
-            <BibleIcon size={20} className="group-hover:rotate-12 transition-transform" />
-            <span className="text-[11px] md:text-sm font-bold uppercase tracking-widest">Bíblia</span>
-          </button>
-          
-          <div className="w-[1px] h-6 bg-white/10 mx-1 hidden md:block" />
-
-          {/* BOTÃO AJUSTES */}
-          <button 
-            onClick={() => setIsSettingsOpen(true)}
-            className="flex items-center gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-all active:scale-95 group"
-          >
-            <Settings size={20} className="group-hover:rotate-90 transition-transform duration-500" />
-            <span className="text-[11px] md:text-sm font-bold uppercase tracking-widest">Ajustes</span>
-          </button>
-
-        </nav>
-      </div>
-
-      <div className={`px-4 md:px-12 lg:px-20 pt-32 pb-16 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+      <div className={`px-4 md:px-12 lg:px-20 pt-12 pb-32 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
         <header className="mb-12 md:mb-16 max-w-2xl">
           <h1 className="text-[28px] md:text-[46px] leading-[1.2] mb-4 md:mb-6" style={{ fontFamily: "'Crimson Text', serif" }}>
@@ -230,6 +203,30 @@ export default function App() {
           </section>
         </div>
       </div>
+
+      {/* --- NAVBAR FIXA NO RODAPÉ --- */}
+      <footer className="fixed bottom-0 left-0 right-0 z-[50] flex justify-center p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
+        <nav className="flex items-center gap-2 md:gap-4 p-2 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+          
+          <button 
+            onClick={() => setIsLibraryOpen(true)}
+            className="flex items-center gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl bg-[#2FA4FF]/10 hover:bg-[#2FA4FF]/20 text-[#2FA4FF] border border-[#2FA4FF]/20 transition-all active:scale-95 group"
+          >
+            <BibleIcon size={20} className="group-hover:rotate-12 transition-transform" />
+            <span className="text-[11px] md:text-sm font-bold uppercase tracking-widest">Bíblia</span>
+          </button>
+          
+          <div className="w-[1px] h-6 bg-white/10 mx-1" />
+
+          <button 
+            onClick={() => setIsSettingsOpen(true)}
+            className="flex items-center gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-all active:scale-95 group"
+          >
+            <Settings size={20} className="group-hover:rotate-90 transition-transform duration-500" />
+            <span className="text-[11px] md:text-sm font-bold uppercase tracking-widest">Ajustes</span>
+          </button>
+        </nav>
+      </footer>
 
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userName={userName} onUserNameChange={(n) => { setUserName(n); localStorage.setItem('bibleUserName', n); }} />
       

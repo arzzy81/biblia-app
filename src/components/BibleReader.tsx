@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X, BookOpen, Loader2, CheckCircle2, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { fetchBibleChapter } from '../utils/bibleApi';
+import { X, ChevronLeft, ChevronRight, BookOpen, Loader2, CheckCircle2, RefreshCw, Copy, Plus, Minus } from 'lucide-react';
+import { fetchBibleChapter } from '../utils/bibleApi'; // Ajustado para o seu utilitário real
+import { toast } from 'sonner';
 
 interface BibleReaderProps {
   isOpen: boolean;
@@ -22,122 +23,132 @@ export function BibleReader({
   onMarkAsRead,
 }: BibleReaderProps) {
   const [currentChapter, setCurrentChapter] = useState(chapter);
-  const [chapterText, setChapterText] = useState('');
+  const [chapterText, setChapterText] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState(18);
 
   useEffect(() => {
     if (isOpen) setCurrentChapter(chapter);
-  }, [isOpen, chapter]);
+  }, [isOpen, book, chapter]);
 
   useEffect(() => {
-    if (isOpen) {
-      const load = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const text = await fetchBibleChapter(book, currentChapter);
-          setChapterText(text);
-        } catch (err: any) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-      load();
+    if (isOpen) loadChapter();
+  }, [isOpen, currentChapter]);
+
+  const loadChapter = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const text = await fetchBibleChapter(book, currentChapter);
+      setChapterText(text);
+    } catch (err) {
+      setError('Erro ao carregar capítulo');
+    } finally {
+      setLoading(false);
     }
-  }, [isOpen, currentChapter, book]);
+  };
+
+  const handleCopyText = async () => {
+    try {
+      await navigator.clipboard.writeText(chapterText);
+      toast.success('Copiado!');
+    } catch (err) {
+      toast.error('Erro ao copiar');
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
-    // CAMADA 1: Ocupa a tela toda. O fundo é preto sólido para garantir que NADA do app apareça.
-    <div className="fixed inset-0 z-[10000] bg-black flex items-center justify-center">
-      
-      {/* CAMADA 2: O quadro de leitura. Ele tem uma cor sólida (não transparente). */}
-      <div className="relative w-full h-full max-w-4xl bg-[#0b1f2a] flex flex-col shadow-2xl">
+    <>
+      {/* 1. OVERLAY: Escurece o fundo completamente para isolar a janela */}
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* 2. JANELA FLUTUANTE (Reader Panel) */}
+      <div className="fixed inset-0 md:inset-x-4 md:inset-y-10 md:max-w-4xl md:mx-auto bg-[#0b1f2a] border border-white/10 md:rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] z-[101] flex flex-col overflow-hidden">
         
-        {/* CABEÇALHO: Fundo sólido para não vazar texto */}
-        <header className="p-4 border-b border-white/10 flex justify-between items-center bg-[#162c38]">
+        {/* HEADER: Fundo sólido para não vazar o texto de fundo */}
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10 bg-[#162c38]">
           <div className="flex items-center gap-3">
-            <BookOpen className="text-blue-400" size={24} />
+            <BookOpen className="w-6 h-6 text-[#2FA4FF]" />
             <div>
-              <h2 className="text-white font-bold text-lg leading-none">{book} {currentChapter}</h2>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Leitura Oficial NVI</p>
+              <h2 className="text-lg md:text-xl font-bold text-white">
+                {book} {currentChapter}
+              </h2>
+              <p className="text-[10px] text-blue-300/60 uppercase tracking-widest">
+                NVI - Tradução Oficial
+              </p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center bg-black/30 rounded-lg p-1">
-              <button className="p-2 hover:bg-white/10 text-gray-400" onClick={() => setFontSize(s => Math.max(12, s-2))}><Minus size={18}/></button>
-              <button className="p-2 hover:bg-white/10 text-gray-400" onClick={() => setFontSize(s => Math.min(32, s+2))}><Plus size={18}/></button>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-black/20 rounded-lg p-1">
+              <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-1.5 hover:bg-white/10 rounded"><Minus className="w-4 h-4" /></button>
+              <button onClick={() => setFontSize(Math.min(30, fontSize + 2))} className="p-1.5 hover:bg-white/10 rounded"><Plus className="w-4 h-4" /></button>
             </div>
+
+            <button onClick={() => loadChapter()} className="p-2 hover:bg-white/10 rounded-lg text-gray-400"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /></button>
+            <button onClick={handleCopyText} className="p-2 hover:bg-white/10 rounded-lg text-gray-400"><Copy className="w-4 h-4" /></button>
             
-            <button 
-              className={`p-2 transition-colors ${isRead ? 'text-green-400' : 'text-gray-500'}`}
+            <button
               onClick={onMarkAsRead}
+              className={`p-2 rounded-lg transition-all ${isRead ? 'text-green-400' : 'text-gray-400'}`}
             >
-              <CheckCircle2 size={26} className={isRead ? "fill-green-400/20" : ""} />
+              <CheckCircle2 className={`w-6 h-6 ${isRead ? 'fill-green-400/20' : ''}`} />
             </button>
 
-            <button className="p-2 text-white/70 hover:text-white" onClick={onClose}>
-              <X size={30}/>
-            </button>
+            <button onClick={onClose} className="p-2 hover:bg-red-500/20 text-white rounded-lg"><X className="w-6 h-6" /></button>
           </div>
-        </header>
+        </div>
 
-        {/* ÁREA DO TEXTO: Aqui é o segredo. Fundo TOTALMENTE SÓLIDO. */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-16 bg-[#0b1f2a]">
+        {/* CONTENT: Área do texto com fundo SÓLIDO */}
+        <div className="flex-1 overflow-y-auto p-6 md:p-12 bg-[#0b1f2a] custom-scrollbar">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-400">
-              <Loader2 className="animate-spin" size={40} />
-              <p>Buscando escrituras...</p>
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <Loader2 className="w-10 h-10 text-[#2FA4FF] animate-spin" />
+              <span className="text-gray-500 text-xs tracking-widest">CARREGANDO...</span>
             </div>
           ) : error ? (
-            <div className="text-center p-10 text-red-400 bg-red-900/10 rounded-xl border border-red-900/20">
-              {error}
-            </div>
+            <div className="text-center text-red-400 p-10">{error}</div>
           ) : (
-            <div 
-              style={{ fontSize: `${fontSize}px` }} 
-              className="text-gray-100 leading-[1.8] font-serif whitespace-pre-wrap max-w-2xl mx-auto pb-32"
-            >
-              {/* O texto agora está sobre um fundo azul-petróleo escuro totalmente sólido */}
-              {chapterText}
+            <div className="max-w-2xl mx-auto">
+              <div 
+                className="leading-[1.8] whitespace-pre-wrap text-gray-200 font-serif"
+                style={{ fontSize: `${fontSize}px` }}
+              >
+                {chapterText}
+              </div>
             </div>
           )}
-        </main>
+        </div>
 
-        {/* RODAPÉ: Fundo sólido */}
-        <footer className="p-4 border-t border-white/10 flex justify-between items-center bg-[#162c38]">
-          <button 
-            disabled={currentChapter <= 1}
-            onClick={() => {
-              setCurrentChapter(c => c - 1);
-              document.querySelector('main')?.scrollTo(0,0);
-            }}
-            className="flex items-center gap-2 text-sm text-gray-300 disabled:opacity-20 px-4 py-2 bg-black/20 rounded-lg"
+        {/* FOOTER: Navegação */}
+        <div className="flex items-center justify-between p-4 md:p-6 border-t border-white/10 bg-[#162c38]">
+          <button
+            onClick={() => setCurrentChapter(c => c - 1)}
+            disabled={currentChapter === 1}
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-10 rounded-xl transition-all"
           >
-            <ChevronLeft size={20} /> Anterior
+            <ChevronLeft className="w-4 h-4" /> Anterior
           </button>
-          
-          <span className="text-xs font-bold text-blue-400 uppercase tracking-tighter">
+
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
             Capítulo {currentChapter} de {totalChapters}
-          </span>
+          </p>
 
-          <button 
-            disabled={currentChapter >= totalChapters}
-            onClick={() => {
-              setCurrentChapter(c => c + 1);
-              document.querySelector('main')?.scrollTo(0,0);
-            }}
-            className="flex items-center gap-2 text-sm text-gray-300 disabled:opacity-20 px-4 py-2 bg-black/20 rounded-lg"
+          <button
+            onClick={() => setCurrentChapter(c => c + 1)}
+            disabled={currentChapter === totalChapters}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 disabled:opacity-10 rounded-xl transition-all"
           >
-            Próximo <ChevronRight size={20} />
+            Próximo <ChevronRight className="w-4 h-4" />
           </button>
-        </footer>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

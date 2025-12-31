@@ -31,7 +31,7 @@ export function BibleReader({
   useEffect(() => {
     if (isOpen) {
       setCurrentChapter(chapter);
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'; // Trava o scroll do fundo
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -59,25 +59,22 @@ export function BibleReader({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-0 md:p-4 lg:p-10">
-      
-      {/* 1. CAMADA DE DESFOQUE DO FUNDO (Aqui você aumenta o blur se quiser) */}
+      {/* 1. FUNDO PRETO TOTAL - Bloqueia a visão do que está atrás */}
       <div 
-        className="absolute inset-0 bg-black/90 backdrop-blur-xl" 
+        className="absolute inset-0 bg-black/98 backdrop-blur-sm" 
         onClick={onClose} 
       />
 
-      {/* 2. JANELA DE LEITURA (Fundo totalmente SÓLIDO para não vazar texto) */}
+      {/* 2. JANELA FLUTUANTE - Cor Sólida, Sem Transparência */}
       <div className="relative w-full h-full max-w-5xl bg-[#0b161d] shadow-[0_0_60px_rgba(0,0,0,1)] md:rounded-2xl flex flex-col overflow-hidden border border-white/10">
         
-        {/* CABEÇALHO SÓLIDO - NVI */}
+        {/* CABEÇALHO SÓLIDO */}
         <div className="flex items-center justify-between p-4 md:p-6 bg-[#122835] border-b border-white/5">
           <div className="flex items-center gap-4">
             <BookOpen className="w-6 h-6 text-[#2FA4FF]" />
             <div>
               <h2 className="text-white font-bold text-lg md:text-xl">{book} {currentChapter}</h2>
-              <p className="text-[10px] text-blue-300/40 uppercase tracking-widest mt-1">
-                NVI - Nova Versão Internacional
-              </p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-tighter">NVI - Nova Versão Internacional</p>
             </div>
           </div>
 
@@ -98,7 +95,7 @@ export function BibleReader({
           </div>
         </div>
 
-        {/* ÁREA DO TEXTO - FUNDO 100% OPACO (Nada de transparência aqui) */}
+        {/* CORPO DO TEXTO - FUNDO TOTALMENTE OPACO */}
         <div className="flex-1 overflow-y-auto p-6 md:p-12 bg-[#0b161d]">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full">
@@ -127,7 +124,7 @@ export function BibleReader({
             disabled={currentChapter === 1}
             className="flex items-center gap-2 text-sm font-bold text-gray-400 disabled:opacity-10"
           >
-            <ChevronLeft size={18} /> ANTERIOR
+            <ChevronLeft /> ANTERIOR
           </button>
           
           <span className="text-[10px] text-gray-500 font-mono">{currentChapter} / {totalChapters}</span>
@@ -137,7 +134,7 @@ export function BibleReader({
             disabled={currentChapter === totalChapters}
             className="flex items-center gap-2 text-sm font-bold text-[#2FA4FF] disabled:opacity-10"
           >
-            PRÓXIMO <ChevronRight size={18} />
+            PRÓXIMO <ChevronRight />
           </button>
         </div>
       </div>

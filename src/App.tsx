@@ -181,7 +181,8 @@ export default function App() {
                 className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5 transition-all active:scale-95 group"
               >
                 <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes</span>
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes
+                </span>
               </button>
             </nav>
           </div>

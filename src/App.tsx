@@ -188,32 +188,28 @@ export default function App() {
         </div>
       </header>
 
-    {/* --- 1) HERO SECTION - SLOGAN UNIFORME E EQUILIBRADO --- */}
-<section className="px-6 text-center py-12 md:py-20">
-  <div className="max-w-3xl mx-auto space-y-12">
-    
-    {/* Slogan com 3 linhas idênticas */}
-    <div className="space-y-1">
-      <h1 className="text-3xl md:text-6xl font-serif italic text-[#2FA4FF] block">
-        Um dia por vez.
-      </h1>
-      <h1 className="text-3xl md:text-6xl font-serif italic text-[#2FA4FF] block">
-        Um texto por dia.
-      </h1>
-      <h1 className="text-3xl md:text-6xl font-serif italic text-[#2FA4FF] block">
-        Uma vida transformada.
-      </h1>
-    </div>
-    
-    {/* Texto de apoio menor e centralizado */}
-    <div className="max-w-md mx-auto">
-      <p className="text-sm md:text-base text-slate-400 leading-relaxed font-light">
-        "Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado..."
-      </p>
-    </div>
+      {/* --- CONTEÚDO PRINCIPAL --- */}
+      {/* pt-[calc(64px+env(safe-area-inset-top))] ajusta o padding conforme a altura da barra + notch */}
+      <main className={`px-4 md:px-12 lg:px-20 pt-[calc(84px+env(safe-area-inset-top))] md:pt-32 pb-20 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+        
+        <header className="mb-12 md:mb-16 max-w-2xl">
+          <h1 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
+            Um dia por vez.<br /> 
+            Um texto por dia.<br /> 
+            <span className="font-bold text-[#2FA4FF] not-italic">Uma vida transformada.</span>
+          </h1>
+          <p className="text-[14px] md:text-[18px] text-[#DADADA] border-l-2 border-[#2FA4FF]/30 pl-6">
+            Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
+          </p>
+        </header>
 
-  </div>
-</section>
+        <div className="text-center mb-12 md:mb-20">
+          <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">Progresso de Leitura</p>
+          <h2 className="text-[40px] md:text-[80px] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black" style={{ fontFamily: "'Crimson Text', serif" }}>
+            {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
+          </h2>
+        </div>
+
         <div className="mb-12 md:mb-20">
           <DailyReadingCard
             currentDay={selectedDay}

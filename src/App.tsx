@@ -193,11 +193,11 @@ export default function App() {
       <main className={`px-4 md:px-12 lg:px-20 pt-[calc(84px+env(safe-area-inset-top))] md:pt-32 pb-20 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
         
         <header className="mb-12 md:mb-16 max-w-2xl">
-          <h2 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
-            Um dia por vez.<br /> 
-            Um texto por dia.<br /> 
-            Uma vida transformada.<br />
-          </h2>
+          <h1 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
+            Um dia por vez. 
+            Um texto por dia. 
+            Uma vida transformada.
+          </h1>
           <p className="text-[14px] md:text-[18px] text-[#DADADA] border-l-2 border-[#2FA4FF]/30 pl-6">
             Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
           </p>

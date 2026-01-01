@@ -181,7 +181,8 @@ export default function App() {
                 className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5 transition-all active:scale-95 group"
               >
                 <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes</span>
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes
+                </span>
               </button>
             </nav>
           </div>
@@ -194,18 +195,21 @@ export default function App() {
         
         <header className="mb-12 md:mb-16 max-w-2xl">
           <h1 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
-            Um dia por vez.<br /> 
-            Um texto por dia.<br /> 
-            <span className="font-bold text-[#2FA4FF] not-italic">Uma vida transformada.</span>
+            <br />
+            Um dia por vez. <br />
+            Um texto por dia.  <br />
+            Uma vida transformada.  
           </h1>
           <p className="text-[14px] md:text-[18px] text-[#DADADA] border-l-2 border-[#2FA4FF]/30 pl-6">
             Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
           </p>
-        </header>
-
-        <div className="text-center mb-12 md:mb-20">
-          <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">Progresso de Leitura</p>
-          <h2 className="text-[40px] md:text-[80px] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black" style={{ fontFamily: "'Crimson Text', serif" }}>
+           </header>
+        
+        <div className="text-center mb-12 md:mb-20 relative">
+          <p className="text-[60px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">
+    Progresso de Leitura
+          </p>
+           <h2 className="text-[36px] md:text-[72px] mb-3 md:mb-4 bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent leading-tight" style={{ fontFamily: "'Crimson Text', serif" }}>
             {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
           </h2>
         </div>
@@ -220,13 +224,11 @@ export default function App() {
             onReadNow={handleReadNow}
           />
         </div>
-
-        <div className="space-y-20">
+ <div className="space-y-20">
           <section>
             <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Antigo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {oldTestamentBooks.map((book) => (
-                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap12">
+              {oldTestamentBooks.map((book) => (<BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
             </div>
           </section>

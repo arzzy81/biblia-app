@@ -155,34 +155,21 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white flex flex-col font-sans overflow-x-hidden">
       <Toaster position="top-center" theme="dark" />
 
-      {/* --- BARRA SUPERIOR (APP BAR) FULL-WIDTH --- */}
+      {/* --- HEADER FIXO --- */}
       <header className="fixed top-0 left-0 right-0 w-full z-[100] bg-black/60 backdrop-blur-2xl border-b border-white/10 shadow-lg">
-        {/* Padding extra para Safe Area do iPhone (Notch) */}
         <div className="pt-[env(safe-area-inset-top)]">
           <div className="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
-            
-            {/* TÍTULO/LOGO À ESQUERDA */}
-            <div className="font-serif italic text-lg md:text-xl font-medium tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+            <div className="font-serif italic text-lg md:text-xl font-medium text-white">
               Bible Life
             </div>
-
-            {/* BOTÕES DE NAVEGAÇÃO À DIREITA */}
             <nav className="flex items-center gap-2 md:gap-4">
-              <button
-                onClick={() => setIsLibraryOpen(true)}
-                className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-[#2FA4FF]/10 text-[#2FA4FF] hover:bg-[#2FA4FF]/20 border border-[#2FA4FF]/20 transition-all active:scale-95 group"
-              >
-                <BibleIcon size={18} className="group-hover:rotate-12 transition-transform" />
+              <button onClick={() => setIsLibraryOpen(true)} className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-[#2FA4FF]/10 text-[#2FA4FF] border border-[#2FA4FF]/20 transition-all active:scale-95 group">
+                <BibleIcon size={18} />
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Bíblia</span>
               </button>
-
-              <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5 transition-all active:scale-95 group"
-              >
-                <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes
-                </span>
+              <button onClick={() => setIsSettingsOpen(true)} className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-white/5 text-gray-400 border border-white/5 transition-all active:scale-95 group">
+                <Settings size={18} />
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes</span>
               </button>
             </nav>
           </div>
@@ -190,31 +177,42 @@ export default function App() {
       </header>
 
       {/* --- CONTEÚDO PRINCIPAL --- */}
-      {/* pt-[calc(64px+env(safe-area-inset-top))] ajusta o padding conforme a altura da barra + notch */}
-      <main className={`px-4 md:px-12 lg:px-20 pt-[calc(84px+env(safe-area-inset-top))] md:pt-32 pb-20 transition-all duration-500 flex-1 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+      <main className={`flex-1 flex flex-col pt-[calc(110px+env(safe-area-inset-top))] md:pt-48 pb-24 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : ''}`}>
         
-        <header className="mb-12 md:mb-16 max-w-2xl">
-          <h1 className="text-[28px] md:text-[52px] leading-[1.1] mb-6 font-light italic" style={{ fontFamily: "'Crimson Text', serif" }}>
-            <br />
-            Um dia por vez. <br />
-            Um texto por dia.  <br />
-            Uma vida transformada.  
-          </h1>
-          <p className="text-[14px] md:text-[18px] text-[#DADADA] border-l-2 border-[#2FA4FF]/30 pl-6">
-            Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
-          </p>
-           </header>
-        
-        <div className="text-center mb-12 md:mb-20 relative">
-          <p className="text-[60px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">
-    Progresso de Leitura
-          </p>
-           <h2 className="text-[36px] md:text-[72px] mb-3 md:mb-4 bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent leading-tight" style={{ fontFamily: "'Crimson Text', serif" }}>
-            {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
-          </h2>
-        </div>
+        {/* SLOGAN HERO */}
+        <section className="px-6 text-center mb-16 md:mb-24">
+          <div className="max-w-3xl mx-auto space-y-2">
+            <h1 className="text-[32px] md:text-[64px] leading-tight font-light italic text-[#2FA4FF]" style={{ fontFamily: "'Crimson Text', serif" }}>
+              Um dia por vez.
+            </h1>
+            <h1 className="text-[32px] md:text-[64px] leading-tight font-light italic text-[#2FA4FF]" style={{ fontFamily: "'Crimson Text', serif" }}>
+              Um texto por dia.
+            </h1>
+            <h1 className="text-[32px] md:text-[64px] leading-tight font-light italic text-[#2FA4FF]" style={{ fontFamily: "'Crimson Text', serif" }}>
+              Uma vida transformada.
+            </h1>
+          </div>
+        </section>
 
-        <div className="mb-12 md:mb-20">
+        {/* PROGRESSO DE LEITURA GIGANTE */}
+        <section className="px-6 mb-24 md:mb-32 text-center flex flex-col items-center">
+            <p className="text-[10px] tracking-[0.5em] text-[#2FA4FF] font-black uppercase mb-4">Progresso de Leitura</p>
+            <h2 className="!text-[80px] md:!text-[150px] leading-[0.8] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black mb-10" style={{ fontFamily: "'Crimson Text', serif" }}>
+               {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
+            </h2>
+            {/* Barra Horizontal */}
+            <div className="w-full max-w-md px-6">
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] transition-all duration-1000"
+                  style={{ width: `${readingPercentage}%` }}
+                />
+              </div>
+            </div>
+        </section>
+
+        {/* LEITURA DO DIA */}
+        <div className="px-4 md:px-12 lg:px-20 mb-32">
           <DailyReadingCard
             currentDay={selectedDay}
             dailyReading={dailyReading}
@@ -224,22 +222,21 @@ export default function App() {
             onReadNow={handleReadNow}
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
-            {oldTestamentBooks.map((book) => (
-              <BookCard
-                key={book.name}
-                book={book}
-                readChapters={readChapters[book.name] || new Set()}
-                onToggleChapter={(chapter) => toggleChapter(book.name, chapter)}
-                onReadNow={handleReadNow}
-              />
-            ))}
-          </div>
-        </div>
+
+        {/* LISTAGEM DE LIVROS */}
+        <div className="px-4 md:px-12 lg:px-20 space-y-32">
+          <section>
+            <h3 className="text-center text-[40px] md:text-[80px] tracking-[0.2em] uppercase text-white/10 font-black italic mb-12" style={{ fontFamily: "'Crimson Text', serif" }}>Antigo Testamento</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12">
+              {oldTestamentBooks.map((book) => (
+                <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
+              ))}
+            </div>
+          </section>
 
           <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-8 italic">Novo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h3 className="text-center text-[40px] md:text-[80px] tracking-[0.2em] uppercase text-white/10 font-black italic mb-12" style={{ fontFamily: "'Crimson Text', serif" }}>Novo Testamento</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12">
               {newTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}

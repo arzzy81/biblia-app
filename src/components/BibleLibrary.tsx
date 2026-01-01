@@ -63,7 +63,7 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
               
               {/* BARRA DE PESQUISA SIMPLES E FUNCIONAL */}
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2FA4FF] group-focus-within:text-white transition-colors" />
+                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2FA4FF] group-focus-within:text-white transition-colors" />
                 <input
                   type="text"
                   placeholder="Pesquisar livro..."

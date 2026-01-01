@@ -62,16 +62,16 @@ export function BibleLibrary({ isOpen, onClose, books, onSelectChapter }: BibleL
             <div className="space-y-6">
               
               {/* BARRA DE PESQUISA SIMPLES E FUNCIONAL */}
-              <div className="relative group">
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2FA4FF] group-focus-within:text-white transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Pesquisar livro..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#2FA4FF]/50 focus:bg-white/10 transition-all"
-                />
-              </div>
+              <div className="group w-full flex items-center gap-3 px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl focus-within:border-[#2FA4FF]/50 focus-within:bg-white/10 transition-all">
+  <Search className="w-4 h-4 text-[#2FA4FF] group-focus-within:text-white transition-colors flex-shrink-0" />
+  <input
+    type="text"
+    placeholder="Pesquisar livro..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="w-full bg-transparent text-white placeholder:text-white/30 focus:outline-none"
+  />
+</div>
 
               {/* Lista de Livros */}
               <div className="grid grid-cols-1 gap-2">

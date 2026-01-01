@@ -55,24 +55,79 @@ export function BibleReader({
     }
   };
 
-  // Função para diagramar o texto: Transforma números de versículos em quebras de linha
+  // --- NOVA FUNÇÃO DE DIAGRAMAÇÃO INTELIGENTE ---
   const renderFormattedText = (text: string) => {
-    // Esta regex identifica números no início ou meio do texto (ex: "1 No princípio...")
-    const verses = text.split(/(\d+)/g);
+    // Divide o texto por qualquer sequência de números
+    const parts = text.split(/(\d+)/);
     const elements = [];
     
-    for (let i = 1; i < verses.length; i += 2) {
-      const number = verses[i];
-      const content = verses[i + 1];
+    let currentVerseNumber = 0;
+    let bufferText = ""; // Armazena o texto do versículo atual
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      
+      // Se a parte for vazia (pode acontecer no split), ignora
+      if (!part) continue;
+
+      // Verifica se a parte é APENAS números
+      const isNumber = /^\d+$/.test(part);
+
+      if (isNumber) {
+        const num = parseInt(part, 10);
+        
+        // LÓGICA DE CORREÇÃO:
+        // Só consideramos que é um "Novo Versículo" se o número for:
+        // 1. O número "1" (se ainda não começamos); OU
+        // 2. Exatamente o sucessor do versículo anterior (ex: se estamos no 4, aceitamos o 5).
+        // Isso impede que "930" (anos) seja lido como versículo, pois 930 não vem depois do 5.
+        const isNextVerse = (currentVerseNumber === 0 && num === 1) || (num === currentVerseNumber + 1);
+
+        if (isNextVerse) {
+          // Se tínhamos texto acumulado do versículo anterior, salvamos agora
+          if (currentVerseNumber > 0 && bufferText.trim()) {
+            elements.push(
+              <div key={currentVerseNumber} className="mb-4 flex gap-4 items-start group hover:bg-white/5 p-2 rounded-lg transition-colors">
+                <span className="text-[#2FA4FF] font-sans font-bold text-sm mt-1 min-w-[20px] select-none opacity-70 group-hover:opacity-100">{currentVerseNumber}</span>
+                <span className="flex-1 text-[#e2e8f0] leading-relaxed">{bufferText}</span>
+              </div>
+            );
+          } else if (bufferText.trim()) {
+             // Caso tenha texto ANTES do versículo 1 (títulos ou introduções), renderiza sem número
+             elements.push(
+                <div key="intro" className="mb-6 text-gray-400 italic text-center text-sm">{bufferText}</div>
+             );
+          }
+
+          // Reseta o buffer e atualiza o número do versículo atual
+          bufferText = "";
+          currentVerseNumber = num;
+        } else {
+          // Se for um número solto no texto (ex: 930 anos), trata como texto normal
+          bufferText += part;
+        }
+      } else {
+        // Se não for número, é texto normal, adiciona ao buffer
+        bufferText += part;
+      }
+    }
+
+    // Não esquecer de renderizar o ÚLTIMO versículo que ficou no buffer
+    if (currentVerseNumber > 0 && bufferText.trim()) {
       elements.push(
-        <div key={i} className="mb-4 flex gap-4 items-start">
-          <span className="text-[#2FA4FF] font-sans font-bold text-sm mt-1 min-w-[20px]">{number}</span>
-          <span className="flex-1 text-[#e2e8f0]">{content}</span>
+        <div key={currentVerseNumber} className="mb-4 flex gap-4 items-start group hover:bg-white/5 p-2 rounded-lg transition-colors">
+          <span className="text-[#2FA4FF] font-sans font-bold text-sm mt-1 min-w-[20px] select-none opacity-70 group-hover:opacity-100">{currentVerseNumber}</span>
+          <span className="flex-1 text-[#e2e8f0] leading-relaxed">{bufferText}</span>
         </div>
       );
     }
-    return elements.length > 0 ? elements : text;
+
+    // Se a lógica falhar ou o texto for muito curto, retorna o texto simples como fallback
+    if (elements.length === 0) return <p className="text-[#e2e8f0] mb-4 whitespace-pre-wrap">{text}</p>;
+
+    return elements;
   };
+  // ----------------------------------------------
 
   if (!isOpen) return null;
 

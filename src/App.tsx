@@ -155,26 +155,20 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0b1f2a] to-[#2a0f2f] text-white flex flex-col font-sans overflow-x-hidden">
       <Toaster position="top-center" theme="dark" />
 
-      {/* --- BARRA SUPERIOR (HEADER) --- */}
+      {/* --- HEADER FIXO --- */}
       <header className="fixed top-0 left-0 right-0 w-full z-[100] bg-black/60 backdrop-blur-2xl border-b border-white/10 shadow-lg">
         <div className="pt-[env(safe-area-inset-top)]">
           <div className="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
-            <div className="font-serif italic text-lg md:text-xl font-medium tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+            <div className="font-serif italic text-lg md:text-xl font-medium bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
               Bible Life
             </div>
             <nav className="flex items-center gap-2 md:gap-4">
-              <button
-                onClick={() => setIsLibraryOpen(true)}
-                className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-[#2FA4FF]/10 text-[#2FA4FF] hover:bg-[#2FA4FF]/20 border border-[#2FA4FF]/20 transition-all active:scale-95 group"
-              >
-                <BibleIcon size={18} className="group-hover:rotate-12 transition-transform" />
+              <button onClick={() => setIsLibraryOpen(true)} className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-[#2FA4FF]/10 text-[#2FA4FF] border border-[#2FA4FF]/20 transition-all active:scale-95 group">
+                <BibleIcon size={18} />
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Bíblia</span>
               </button>
-              <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5 transition-all active:scale-95 group"
-              >
-                <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
+              <button onClick={() => setIsSettingsOpen(true)} className="flex items-center gap-2 px-3 md:px-5 py-2 rounded-xl bg-white/5 text-gray-400 border border-white/5 transition-all active:scale-95 group">
+                <Settings size={18} />
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Ajustes</span>
               </button>
             </nav>
@@ -182,76 +176,78 @@ export default function App() {
         </div>
       </header>
 
-      {/* --- CONTEÚDO PRINCIPAL --- */}
-      <main className={`flex-1 pt-[calc(84px+env(safe-area-inset-top))] md:pt-40 pb-20 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : 'blur-0 opacity-100'}`}>
+      {/* --- CONTEÚDO PRINCIPAL COM ESPAÇAMENTO SEGURO --- */}
+      <main className={`flex-1 flex flex-col pt-[calc(100px+env(safe-area-inset-top))] md:pt-44 pb-24 transition-all duration-500 ${isReaderOpen || isLibraryOpen ? 'blur-2xl opacity-20 pointer-events-none' : ''}`}>
         
-        {/* 🟦 SEÇÃO 1 — BANNER PRINCIPAL (HERO) */}
-        <section className="px-6 flex flex-col items-center text-center mb-16 md:mb-24">
-          <div className="max-w-3xl w-full">
-            <h1 className="text-4xl md:text-7xl font-serif italic font-light leading-tight mb-4 text-white">
-              Um dia por vez.<br /> 
-              Um texto por dia.
-            </h1>
-            <h2 className="text-xl md:text-3xl font-sans font-bold uppercase tracking-[0.2em] text-[#2FA4FF] mb-8">
-              Uma vida transformada.
-            </h2>
-            <div className="flex justify-center">
-              <p className="text-sm md:text-lg text-slate-400 leading-relaxed max-w-xl italic border-t border-white/10 pt-8">
-                "Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado..."
-              </p>
-            </div>
+        {/* 1) HERO SECTION - SLOGAN UNIFORME */}
+        <section className="px-6 text-center space-y-8 mb-20 md:mb-32">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-6xl font-serif italic text-[#2FA4FF] block">Um dia por vez.</h1>
+            <h1 className="text-3xl md:text-6xl font-serif italic text-[#2FA4FF] block">Um texto por dia.</h1>
+            <h1 className="text-3xl md:text-6xl font-serif italic text-[#2FA4FF] block">Uma vida transformada.</h1>
           </div>
-        </section>
-
-        {/* 🟦 SEÇÃO 2 — PROGRESSO DE LEITURA */}
-        <section className="px-6 flex flex-col items-center text-center mb-16 md:mb-24">
-          <div className="w-full max-w-md bg-white/5 rounded-3xl p-8 border border-white/10 backdrop-blur-sm">
-            <p className="text-[10px] tracking-[0.4em] text-slate-500 font-bold uppercase mb-2">Seu progresso de leitura</p>
-            
-            <div className="text-6xl md:text-7xl font-black bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent mb-6">
-              {readingPercentage}%
-            </div>
-
-            {/* BARRA DE PROGRESSO */}
-            <div className="relative w-full h-3 bg-white/10 rounded-full overflow-hidden">
-              <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] transition-all duration-1000 ease-out"
-                style={{ width: `${readingPercentage}%` }}
-              />
-            </div>
-            
-            <p className="text-xs text-slate-400 mt-4 font-medium italic">
-              {userName ? `${userName}, você já completou parte da sua jornada!` : "Continue sua jornada diária!"}
+          
+          <div className="max-w-md mx-auto">
+            <p className="text-sm md:text-base text-slate-400 leading-relaxed font-light">
+              Quando a Palavra ocupa um lugar diário na rotina, o entendimento é ampliado...
             </p>
           </div>
         </section>
 
-        {/* SEÇÃO DE LEITURA DIÁRIA */}
-        <div className="px-4 md:px-12 lg:px-20 mb-20">
-          <DailyReadingCard
-            currentDay={selectedDay}
-            dailyReading={dailyReading}
-            onDayChange={setSelectedDay}
-            readChapters={readChapters}
-            onToggleChapter={toggleChapter}
-            onReadNow={handleReadNow}
-          />
-        </div>
+        {/* 2) PROGRESSO DE LEITURA - COM RESPIRO E BARRA CONTROLADA */}
+        <section className="px-6 mb-24 md:mb-36">
+          <div className="max-w-lg mx-auto bg-white/[0.03] border border-white/10 rounded-[40px] p-10 md:p-12 text-center">
+            <span className="text-[10px] tracking-[0.4em] text-slate-500 font-bold uppercase block mb-4 italic">Seu progresso de leitura</span>
+            <div className="text-7xl md:text-8xl font-black bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent mb-8">
+              {readingPercentage}%
+            </div>
+            
+            {/* Barra de Progresso com Padding Lateral Interno */}
+            <div className="px-4 md:px-8">
+              <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-[#2FA4FF] shadow-[0_0_15px_rgba(47,164,255,0.5)] transition-all duration-1000 ease-out"
+                  style={{ width: `${readingPercentage}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* LISTAGEM DE LIVROS */}
-        <div className="px-4 md:px-12 lg:px-20 space-y-24">
+        {/* 3) LEITURA DO DIA - SEÇÃO ISOLADA */}
+        <section className="px-4 md:px-12 lg:px-20 mb-32">
+           <DailyReadingCard
+              currentDay={selectedDay}
+              dailyReading={dailyReading}
+              onDayChange={setSelectedDay}
+              readChapters={readChapters}
+              onToggleChapter={toggleChapter}
+              onReadNow={handleReadNow}
+            />
+        </section>
+
+        {/* 4) LISTA DE LIVROS - GRIDS COM GAPS REAIS */}
+        <div className="px-4 md:px-12 lg:px-20 space-y-32">
+          {/* Antigo Testamento */}
           <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-10 italic font-bold">Antigo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex flex-col items-center mb-12">
+              <h3 className="text-xs tracking-[0.5em] uppercase text-[#2FA4FF] font-bold">Antigo Testamento</h3>
+              <div className="w-12 h-px bg-white/20 mt-4" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
               {oldTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
             </div>
           </section>
 
+          {/* Novo Testamento */}
           <section>
-            <h3 className="text-center text-xs tracking-[0.3em] uppercase text-gray-500 mb-10 italic font-bold">Novo Testamento</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+             <div className="flex flex-col items-center mb-12">
+              <h3 className="text-xs tracking-[0.5em] uppercase text-[#8B5CF6] font-bold">Novo Testamento</h3>
+              <div className="w-12 h-px bg-white/20 mt-4" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
               {newTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
@@ -260,6 +256,7 @@ export default function App() {
         </div>
       </main>
 
+      {/* MODAIS (MANTIDOS IGUAIS) */}
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} userName={userName} onUserNameChange={(n) => { setUserName(n); localStorage.setItem('bibleUserName', n); }} />
       <BibleLibrary isOpen={isLibraryOpen} onClose={() => setIsLibraryOpen(false)} books={books as any} onSelectChapter={handleReadNow} />
       <BibleReader

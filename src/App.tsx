@@ -200,6 +200,7 @@ export default function App() {
             <h2 className="!text-[80px] md:!text-[150px] leading-[0.8] bg-gradient-to-r from-[#2FA4FF] to-[#8B5CF6] bg-clip-text text-transparent font-black mb-10" style={{ fontFamily: "'Crimson Text', serif" }}>
                {userName ? `${userName.toUpperCase()}, VOCÊ JÁ LEU ${readingPercentage}%` : `VOCÊ JÁ LEU ${readingPercentage}%`}
             </h2>
+            {/* Barra Horizontal */}
             <div className="w-full max-w-md px-6">
               <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
                 <div 
@@ -222,12 +223,11 @@ export default function App() {
           />
         </div>
 
-        {/* LISTAGEM DE LIVROS - AJUSTE DE ESPAÇAMENTO AQUI */}
+        {/* LISTAGEM DE LIVROS */}
         <div className="px-4 md:px-12 lg:px-20 space-y-32">
           <section>
             <h3 className="text-center text-[40px] md:text-[80px] tracking-[0.2em] uppercase text-white/10 font-black italic mb-12" style={{ fontFamily: "'Crimson Text', serif" }}>Antigo Testamento</h3>
-            {/* Aumentei o gap para 10 no mobile e 16 no desktop */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12">
               {oldTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
@@ -236,8 +236,7 @@ export default function App() {
 
           <section>
             <h3 className="text-center text-[40px] md:text-[80px] tracking-[0.2em] uppercase text-white/10 font-black italic mb-12" style={{ fontFamily: "'Crimson Text', serif" }}>Novo Testamento</h3>
-            {/* Aumentei o gap para 10 no mobile e 16 no desktop */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12">
               {newTestamentBooks.map((book) => (
                 <BookCard key={book.name} book={book} readChapters={readChapters[book.name] || new Set()} onToggleChapter={(chapter) => toggleChapter(book.name, chapter)} onReadNow={handleReadNow} />
               ))}
